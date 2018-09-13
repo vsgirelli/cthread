@@ -1,6 +1,34 @@
 /*
- *  Arquivo para conter códigos de erro
+ *  Arquivo para conter códigos de erro,
+ *  valores de prioridade,
+ *  estados das threads
  */
 
-#define FUNC_NOT_IMPLEMENTED 0
-#define FUNC_NOT_WORKING 1
+
+// CÓDIGOS DE ERRO
+// aparentemente, ele quer valores negativos pra erro
+#define FUNC_WORKING 0
+#define FUNC_NOT_IMPLEMENTED -1
+#define FUNC_NOT_WORKING -2
+/*
+ * Os valores de prioridade válidos são
+ * 0 - alta
+ * 1 - média
+ * 2 - baixa
+ * Caso uma prioridade diferente for informada, informar código de erro.
+ */
+#define PRIO_ERROR -3
+
+
+// CÓDIGOS DE PRIORIDADE
+#define PRIO_0 0
+#define PRIO_1 1
+#define PRIO_2 2
+
+
+// ESTADOS DE EXECUÇÃO DAS THREADS
+#define THREAD_STATE_CREATED 0
+#define THREAD_STATE_READY 1
+#define THREAD_STATE_RUNNING 2
+#define THREAD_STATE_BLOCKED 3
+#define THREAD_STATE_FINISHED 4

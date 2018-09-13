@@ -1,0 +1,9 @@
+# 12/09/18
+
+-     Leitura do enunciado do trabalho 1 de SISOP:
+
+* tid único por thread:
+Qual algoritmo utilizar para geração desse tid?
+
+
+* como vai funcionar de fato a cjoin?

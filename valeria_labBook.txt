@@ -49,4 +49,5 @@ Três níveis de prioridade: baixo, médio e alto.
 * Respeitar rigorosamente a API indicada no enunciado.
 
 * Possuir códigos de erro para primitivas não funcionais ou não implementadas.
- 
+
+* Anotações das funções no próprio cthread.c

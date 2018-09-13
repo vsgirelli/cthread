@@ -7,3 +7,12 @@ Qual algoritmo utilizar para geração desse tid?
 
 
 * como vai funcionar de fato a cjoin?
+
+
+* ccreate:
+O enunciado diz que deve ser preemptivo, ou seja, quando uma thread for criada e
+possuir prioridade maior do que a thread que está sendo executada (aka, thread
+que acabou de criar uma thread de maior prioridade), a thread deve ser
+preemptava e deve ceder o CPU para a recém criada thread de maior prioridade. No
+entanto, o escalonador é do tipo FIFO, ou seja, a thread recém criada deveria ir
+para o fim da fila de apto, certo? Or i got it wrong?

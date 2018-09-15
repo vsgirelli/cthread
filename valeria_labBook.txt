@@ -51,3 +51,23 @@ Três níveis de prioridade: baixo, médio e alto.
 * Possuir códigos de erro para primitivas não funcionais ou não implementadas.
 
 * Anotações das funções no próprio cthread.c
+
+* cjoin e csem_init:
+quando uma thread t1 vai se bloquear por conta de outra thread t2, tem que
+verificar se essa t2 já tem alguém esperando (só uma thread pode se bloquear por
+uma dada thread). Se não houver ninguém bloqueado por causa de t2, então é
+necessário chamar csem_init. A struct s_sem possui um ponteiro pra fila
+(PFILA2), então é basicamente nessa fila que a gente coloca threads que se
+bloqueiam por uma dada thread. Provavelmente seria bom criar filas de semáforos:
+como podem haver diferentes tipos de recursos sendo controlados por semáforos,
+podemos ter por exemplo uma fila de threads que estão bloqueadas por cjoin.
+Nessa fila só haverão semáforos com count = 1 (só uma thread pode se bloquear
+por uma dada thread). Os membros dessa fila podem ser EDs podem ter um id
+(id da thread que está sendo esperada) e um ponteiro pro semáforo que controla
+essa thread. Então por ex:
+t1 chama cjoin esperando t2
+então procura na fila de threads bloqueadas por cjoin se já existe um elemento
+com nome t2 (se já existe uma thread bloqueada esperando t2)
+se não existe, chama csem_init com count = 1
+adiciona esse semáforo pra lista de semáforos pra thread bloqueadas com cjoin
+chama cwait pra botar t1 na fila do semáforo pra t2.

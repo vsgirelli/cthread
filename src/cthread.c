@@ -69,6 +69,22 @@ Parâmetros:
 Retorno:
   Quando executada corretamente: retorna 0 (zero)
   Caso contrário, retorna um valor negativo.
+
+Observações:
+  * Uma thread só pode ser esperada por uma única thread. Apenas a primeira
+    thread que pedir cjoin fica bloqueada.
+  
+  * A partir da segunda chama pra mesma thread, cjoin deve retornar código de erro.
+  
+  * Se a chamada for para uma thread que não existe ou que já foi terminada,
+    cjoin retorna um código de erro.
+
+  * Não há estado zombie.
+  
+  * Quando uma thread que bloqueava outras terminar, o escalonador deve ser chamado e
+    deve levar em conta as prioridades.
+
+    (Anotações sobre a cjoin no dúvidas)
 ******************************************************************************/
 int cjoin(int tid) {
   return FUNC_NOT_IMPLEMENTED;
@@ -81,6 +97,15 @@ Parâmetros:
 Retorno:
   Quando executada corretamente: retorna 0 (zero)
   Caso contrário, retorna um valor negativo.
+
+Observações:
+  * inicializa o semáforo. 
+
+  * deve ser chamada obrigatoriamente antes de cwait e csignal.
+  
+  * 1 para mutex. +1 pra questão de recursos.
+  
+  * 
 ******************************************************************************/
 int csem_init(csem_t *sem, int count) {
   return FUNC_NOT_IMPLEMENTED;

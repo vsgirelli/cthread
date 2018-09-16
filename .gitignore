@@ -62,7 +62,7 @@ tags
 
 # Itens do codeblocks 
 *.cbp
-main.c
+#main.c
 
 
 # Kernel Module Compile Results

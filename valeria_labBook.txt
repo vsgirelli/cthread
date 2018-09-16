@@ -71,3 +71,18 @@ com nome t2 (se já existe uma thread bloqueada esperando t2)
 se não existe, chama csem_init com count = 1
 adiciona esse semáforo pra lista de semáforos pra thread bloqueadas com cjoin
 chama cwait pra botar t1 na fila do semáforo pra t2.
+
+* Sobre semáforos:
+Quando uma t1 chama cwait ou cjoin e o semáforo ainda não existe, tem que
+basicamente inicializar ele com 1 no caso de mutex. Assim, inicializa com 1, e
+em seguida a cwait tem que decrementar o valor do semáforo e testar se é menor
+ou igual a zero, pra saber se bota pra dormir.
+Pra semáforos pra controlar recursos depende, mas sempre chega e decrementa o
+valor do semáforo.
+
+* thread main:
+A thread main é uma thread criada pelo próprio so quando cria o processo.
+A main tbm precisa de um contexto: chamadas getcontext e
+makecontext.
+O tid da main deve ser 0, e possuir um TCB.
+Deve ter a menor prioridade: 0.

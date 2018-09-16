@@ -86,3 +86,10 @@ A main tbm precisa de um contexto: chamadas getcontext e
 makecontext.
 O tid da main deve ser 0, e possuir um TCB.
 Deve ter a menor prioridade: 0.
+
+
+# 16/09/18
+
+-   Terminando as anotações sobre o enunciado.
+
+-   Configuração da VM com minha config do vim, .bashrc etc.

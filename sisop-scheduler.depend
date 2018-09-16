@@ -1,0 +1,49 @@
+# depslib dependency file v1.0
+1537119674 source:/home/aluno/T1/sisop-scheduler/exemplos/exemplo.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+
+1537118411 /home/aluno/T1/sisop-scheduler/include/support.h
+
+1537118411 /home/aluno/T1/sisop-scheduler/include/cthread.h
+	"support.h"
+
+1537119679 source:/home/aluno/T1/sisop-scheduler/exemplos/mandel.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+
+1537119682 source:/home/aluno/T1/sisop-scheduler/exemplos/series.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+
+1537119689 source:/home/aluno/T1/sisop-scheduler/exemplos/teste_vetor.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+	<stdlib.h>
+
+1537134741 source:/home/aluno/T1/sisop-scheduler/main.c
+	<stdio.h>
+	<ucontext.h>
+
+1537128775 source:/home/aluno/T1/sisop-scheduler/src/cthread.c
+	"../include/cthread.h"
+	"../include/config.h"
+
+1537118411 /home/aluno/T1/sisop-scheduler/include/config.h
+
+1537119651 source:/home/aluno/T1/sisop-scheduler/src/lib.c
+	<stdio.h>
+	<string.h>
+	"../include/support.h"
+	"../include/cthread.h"
+	"../include/cdata.h"
+
+1537118411 /home/aluno/T1/sisop-scheduler/include/cdata.h
+	"ucontext.h"
+

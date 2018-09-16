@@ -60,6 +60,11 @@ tags
 *.idb
 *.pdb
 
+# Itens do codeblocks 
+*.cbp
+main.c
+
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd

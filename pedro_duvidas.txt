@@ -1,0 +1,4 @@
+Na ccreate, ao criar uma thread com maior prioridade,
+a thread pai não vai nem receber o pid porque antes do retorno,
+o escalonador terá que colocar a thread criada para rodarrrrr
+ 

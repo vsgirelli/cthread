@@ -1,5 +1,5 @@
 #include "../include/cthread.h"
-
+#include "../include/config.h"
 /******************************************************************************
 Parâmetros:
   start: ponteiro para a função que a thread executará.
@@ -14,17 +14,31 @@ Observações:
   * A função deve alocar TCBs e estruturas necessárias para gerência da thread.
   * Ao final da criação da thread, ela deve ser inserida ao fim da lista de aptos (FIFO).
 
-  * A função main possui um comportamento diferente (seção 4 do enunciado).  
+  * A função main possui um comportamento diferente (seção 4 do enunciado).
 
   * Quando um thread de maior prioridade for criada, a thread criadora deve ser preemptada.
 
 ******************************************************************************/
 int ccreate (void* (*start)(void*), void *arg, int prio) {
-  /*
-   *if (prio != PRIO_0 && prio != PRIO_1 && prio != PRIO_2) {
-   *  return PRIO_ERROR;
-   *}
-   */
+
+    // Verifica prioridade
+   if (prio != PRIO_0 && prio != PRIO_1 && prio != PRIO_2) {
+     return PRIO_ERROR;
+   }
+    // http://pubs.opengroup.org/onlinepubs/009695299/functions/makecontext.html
+    // Prioridade dentro dos padrões, próximos passos:
+    // Verificar se a thread main foi criada, 2 casos possíveis:
+    //       1 - Se não existir, vamos ter que criar ela, pegar seu contexto e salvar num TCB,
+    //           podemos criar uma funcao createThread(u_context, func, arg)
+    //       2 - Caso exista prosseguimos para cria_novathread:
+
+
+    // cria_novathread:
+    // Utilizamos a funcao createThread para criar a nova thread
+    //
+
+
+
   return FUNC_NOT_IMPLEMENTED;
 }
 
@@ -37,7 +51,7 @@ Retorno:
 
 Observações:
   * Thread que executa essa função retorna para a fila de aptos.
-  
+
   * Escalonador deve ser chamado para selecionar a próxima thread.
 
 ******************************************************************************/
@@ -73,14 +87,14 @@ Retorno:
 Observações:
   * Uma thread só pode ser esperada por uma única thread. Apenas a primeira
     thread que pedir cjoin fica bloqueada.
-  
+
   * A partir da segunda chama pra mesma thread, cjoin deve retornar código de erro.
-  
+
   * Se a chamada for para uma thread que não existe ou que já foi terminada,
     cjoin retorna um código de erro.
 
   * Não há estado zombie.
-  
+
   * Quando uma thread que bloqueava outras terminar, o escalonador deve ser chamado e
     deve levar em conta as prioridades.
 
@@ -99,13 +113,13 @@ Retorno:
   Caso contrário, retorna um valor negativo.
 
 Observações:
-  * inicializa o semáforo. 
+  * inicializa o semáforo.
 
   * deve ser chamada obrigatoriamente antes de cwait e csignal.
-  
+
   * 1 para mutex. +1 pra questão de recursos.
-  
-  * 
+
+  *
 ******************************************************************************/
 int csem_init(csem_t *sem, int count) {
   return FUNC_NOT_IMPLEMENTED;

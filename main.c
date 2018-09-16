@@ -27,7 +27,7 @@ f2 (void)
 static void
 f3 (void)
 {
-    puts("im blue dadadidadada");
+    puts("Entrou F3");
 
 }
 static void schedThread(){
@@ -48,7 +48,7 @@ scheduler_point (void)
         sched_init = 1;
     }
 
-    puts("ISQUEDULOU");
+    puts("SCHEDULED");
 }
 
 int
@@ -83,7 +83,8 @@ main (void)
 
 
     swapcontext(&ctx[0], &ctx[2]);
-    puts("pipaparopo");
+    swapcontext(&ctx[0], &ctx[1]);
+    puts("T1");
     swapcontext(&ctx[0], &ctx[3]);
     return 0;
 

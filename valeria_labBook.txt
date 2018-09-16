@@ -92,4 +92,13 @@ Deve ter a menor prioridade: 0.
 
 -   Terminando as anotações sobre o enunciado.
 
--   Configuração da VM com minha config do vim, .bashrc etc.
+- Anotações sobre support.h:
+
+Struct FILA2 (ou PFILA2, ponteiro): estrutura de uma lista. Essa é a estrutura
+que a gente pode usar pra criar todas as listas que temos necessidade.
+Struct NODE2 (ou PNODE2, ponteiro): usada pra TCBs. Então a gente vai ter 3
+filas FILA2 com structs do tipo PNODE2 no estado apto, uma pra cada prioridade.
+
+TCBs são structs do tipo NODE2.
+Tudo o que vai de uma fila pra outra são TCBs. Ou seja, na fila PFILA2 do
+csem_t, o que tem lá é uma fila FILA2 de NODE2 (TCBs).

@@ -33,7 +33,7 @@ f3 (void)
 static void schedThread(){
 
     puts("Miiip");
-    //makecontext(&scheduler, schedThread, 0);
+    makecontext(&scheduler, schedThread, 0);
 }
 
 static void

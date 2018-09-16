@@ -35,7 +35,8 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
 
     // cria_novathread:
     // Utilizamos a funcao createThread para criar a nova thread
-    //
+    // Apontando para o scheduler como retorno
+    // Após isso chamar o scheduler
 
 
 

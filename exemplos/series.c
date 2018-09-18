@@ -41,7 +41,7 @@ void* fibonnaci (void *i) {
      return;
 }
 
-int main(int argc, char **argv) {
+int seriesc(int argc, char **argv) {
 	int id0, id1;
 	int i = 10;
 

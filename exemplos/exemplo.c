@@ -21,7 +21,7 @@ void* func1(void *arg) {
 	printf("Eu sou a thread ID1 imprimindo %d\n", *((int *)arg));
 }
 
-int main(int argc, char *argv[]) {
+int exc(int argc, char *argv[]) {
 
 	int	id0, id1;
 	int i;

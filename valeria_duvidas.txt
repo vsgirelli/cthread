@@ -2,14 +2,14 @@
 
 -     Leitura do enunciado do trabalho 1 de SISOP:
 
-* tid único por thread:
+* tid único por thread: OK
 Qual algoritmo utilizar para geração desse tid?
 
 
 * como vai funcionar de fato a cjoin?
 
 
-* ccreate:
+* ccreate: OK
 O enunciado diz que deve ser preemptivo, ou seja, quando uma thread for criada e
 possuir prioridade maior do que a thread que está sendo executada (aka, thread
 que acabou de criar uma thread de maior prioridade), a thread deve ser
@@ -17,7 +17,7 @@ preemptava e deve ceder o CPU para a recém criada thread de maior prioridade. N
 entanto, o escalonador é do tipo FIFO, ou seja, a thread recém criada deveria ir
 para o fim da fila de apto, certo? Or i got it wrong?
 
-* cjoin:
+* cjoin: OK
 Quando uma thread terminar e desbloquear outra, o escalonador deve levar em
 conta prioridades pra selecionar a próxima thread. Como assim? Significa que se
 a thread que estiver bloqueada tiver uma prio baixa, ela é desbloqueada e só vai
@@ -28,7 +28,7 @@ uma única fila de aptos, ela deve estar ordenada por prioridade. Eu prefiro
 fazer 3 listas ordenadas por ordem de chegada, fica mais intuitivo e mais fácil
 de trabalhar.)
 
-* cjoin:
+* cjoin: OK
 Recebe como param o tid cujo término está sendo aguardado.
 Então:
 tid1 chama cjoin passando tid2
@@ -56,6 +56,26 @@ tid1?
   ()
 } 
 
-* sobre a cidentify.
+* sobre a cidentify. OK
 
+* Uma thread pode aumentar sua prioridade?
 
+* No caso de uma thread fazer cyield mas ela ser a única de alta prioridade, ela
+  seria posta pra executar de novo ou o escalonador deve dar chance pra outras
+  threads de baixa prioridade?
+
+* cjoin:
+e se a blocking thread for a main? error? 
+
+* scheduler:
+o modelo de scheduler funciona pra ccreate, cyield e csetprio (caso haja
+preempção).
+No entanto, ele não funciona pra chamadas que bloqueiam threads, só pra chamadas
+que preemptam e botam pra apto.
+Uma solução é criar funções genéricas pra cada um, por ex:
+
+ccreate, cyield e csetprio: salva contexto atual e bota pra apto.
+chama scheduler pra selecionar a próxima thread a ser posta em executando.
+
+pra chamadas bloqueantes: salva o contexto atual e bota pra bloqueado.
+chama scheduler pra selecionar a próxima thread a ser posta em executando.

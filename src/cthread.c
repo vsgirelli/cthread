@@ -34,6 +34,8 @@ Observações:
 
 ******************************************************************************/
 int ccreate (void* (*start)(void*), void *arg, int prio) {
+  if(tcb main == NULL)
+    initialCreate;
 
     // Verifica prioridade
    if (prio != PRIO_0 && prio != PRIO_1 && prio != PRIO_2) {
@@ -46,13 +48,15 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     //           podemos criar uma funcao createThread(u_context, func, arg)
     //       2 - Caso exista prosseguimos para cria_novathread:
 
-
-    // cria_novathread:
-    // Utilizamos a funcao createThread para criar a nova thread
-    // Apontando para o scheduler como retorno
-    // Após isso chamar o scheduler CASO a thread seja de maior prioridade que a atual
-
-
+   // novo tid
+   // criar contexto nova thread (linkar pra rotina de terminateThread)
+   // criar tcb nova thread
+   // linkar contexto ao TCB
+   // Verificar se prio > runningThread->prio
+   //     se sim, chama função que salva o contexto atual e bota o TCB pra o apto
+   //             chama scheduler pra selecionar próxima thread.
+   //     se não, adicionar para a fila certa de apto
+    // retorna ok
 
   return FUNC_NOT_IMPLEMENTED;
 }
@@ -71,10 +75,8 @@ Observações:
 
 ******************************************************************************/
 int cyield(void) {
-    // Coloca  a thread na fila de aptos
-    // Salva o contexto atual
-    // Chama o escalonador
-
+    // chama função que salva o contexto e bota o TCB pra o apto
+    // chama scheduler pra selecionar próxima thread.
 
   return FUNC_NOT_IMPLEMENTED;
 }
@@ -94,13 +96,26 @@ Observações:
 
 ******************************************************************************/
 int csetprio(int tid, int prio) {
+  if (prio != PRIO_0 && prio != PRIO_1 && prio != PRIO_2) {
+    return PRIO_ERROR;
+  }
+  // POsso aumentar a prioridade da main?
 
-    // Verificar se a prioridade está dentre as possíveis
-    // POsso aumentar a prioridade da main?
-
-    // Pela  variável global da thread em execução, setar sua prio
-    // Se a prio for < 3  a gente percorre as threads em apto para ver se alguma tem mais prioridade
-    // Se encontrar chama o escalonador!!
+  runningThread->prio = prio;
+  // if the new priority is lower than the higher priority,
+  // then check if there is any thread with higher priority,
+  // if so, the current thread must suffer preemption.
+  if (runningThread->prio < PRIO_2) {
+    // usar as funções da support.h pra percorrer as listas
+    // verifica na fila de prio 2
+    //    se achou, chama função que salva o contexto e bota o TCB pra o apto
+    //              chama scheduler pra selecionar próxima thread.
+    // se vazia, verifica na fila de prio 1
+    //    se achou, chama função que salva o contexto e bota o TCB pra o apto
+    //              chama scheduler pra selecionar próxima thread.
+    // se não achou em 2 e em 1, então não preempta, pq não há nenhuma thread de
+    // prioridade maior
+  }
 
   return FUNC_NOT_IMPLEMENTED;
 }
@@ -129,16 +144,17 @@ Observações:
     (Anotações sobre a cjoin no dúvidas e no labbook)
 ******************************************************************************/
 int cjoin(int tid) {
-    // Verificar a existência do tid
-    // Verificar se não é um pedido de espera para a main
+    // Verificar a existência do tid pelo qual se quer bloquear
+    // Verificar se não é um pedido de espera para a main (erro?)
 
-    // Verificar se não chama para uma thread que já está bloqueando, aqui podemos fazer 2 coisas:
-    // 1 - Criar uma fila com "threads bloqueadoras" e percorrer para ver se nao existe
-    // 2 - Percorrer a fila de threads bloqueadas esperando join para verificar se aquele tid está bloqueando alguma
+    // Verificar se não chama para uma thread que já está bloqueando:
+    // se, em cjoinQueue, existir um nó cujo blockingTID == tid
+    // então retorna erro
+    // senão, AppendFila2(cjoinQueue, novo nó)
+    // o novo nó irá possuir o tid e o runningThread->tid
 
-    // Após isso acho que  é só salvar o contexto e bloquear a thread e eras isso pessoal
-
-
+    // chama função que salva o contexto e bota o TCB pra bloqueado
+    // chama scheduler pra selecionar próxima thread.
   return FUNC_NOT_IMPLEMENTED;
 }
 

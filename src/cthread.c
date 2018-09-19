@@ -98,7 +98,7 @@ Observações:
   * Quando uma thread que bloqueava outras terminar, o escalonador deve ser chamado e
     deve levar em conta as prioridades.
 
-    (Anotações sobre a cjoin no dúvidas)
+    (Anotações sobre a cjoin no dúvidas e no labbook)
 ******************************************************************************/
 int cjoin(int tid) {
   return FUNC_NOT_IMPLEMENTED;
@@ -117,9 +117,7 @@ Observações:
 
   * deve ser chamada obrigatoriamente antes de cwait e csignal.
 
-  * 1 para mutex. +1 pra questão de recursos.
-
-  *
+  * 1 para mutex. Outros valores pra questão de recursos.
 ******************************************************************************/
 int csem_init(csem_t *sem, int count) {
   return FUNC_NOT_IMPLEMENTED;
@@ -131,6 +129,16 @@ Parâmetros:
 Retorno:
   Quando executada corretamente: retorna 0 (zero)
   Caso contrário, retorna um valor negativo.
+
+Observações:
+  * Solicitar um recurso.
+
+  * Se count > 0, recurso livre, então decrementa count e deixa a thread executar.
+  
+  * Se count <= 0, recurso ocupado, então decrementa count e bota a thread pra
+    dormir (bota ela na lista do semáforo).
+
+  * Sempre se decrementa o count.
 ******************************************************************************/
 int cwait(csem_t *sem) {
   return FUNC_NOT_IMPLEMENTED;
@@ -142,6 +150,20 @@ Parâmetros:
 Retorno:
   Quando executada corretamente: retorna 0 (zero)
   Caso contrário, retorna um valor negativo.
+
+Observações:
+  * A cada chamada incrementa-se o count.
+
+  * Se houver mais de uma thread bloqueada, a primeira deve ser posta pro estado apto
+    (devido à política FIFO).
+
+  * Lembrar que o escalonador é preemptivo por prioridade. Então se csignal
+    acordar uma thread de mais alta prioridade, a que está executando tem que
+    ser preemptada.
+
+  * Deve haver política de prioridade também para as threads que estão
+   aguardando pelo recurso. Se houver uma de média e uma de alta esperando,
+    mesmo que a de média tenha chego antes, a de alta deve ganhar o recurso.
 ******************************************************************************/
 int csignal(csem_t *sem) {
   return FUNC_NOT_IMPLEMENTED;
@@ -149,9 +171,11 @@ int csignal(csem_t *sem) {
 
 /******************************************************************************
 Parâmetros:
-  name:ponteiro para uma área de memória onde deve ser escrito um string que contém os nomes dos componentes do grupo e seus números de cartão.
-  Deve ser uma linha por componente.
-  size:quantidade máxima de caracteres que podem ser copiados para o string de identificação dos componentes do grupo.
+  name: ponteiro para uma área de memória onde deve ser escrito um string que
+    contém os nomes dos componentes do grupo e seus números de cartão.
+    Deve ser uma linha por componente.
+  size: quantidade máxima de caracteres que podem ser copiados para o string de
+    identificação dos componentes do grupo.
 Retorno:
   Quando executada corretamente: retorna 0 (zero)
   Caso contrário, retorna um valor negativo.

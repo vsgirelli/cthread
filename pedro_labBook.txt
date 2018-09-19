@@ -1,0 +1,2 @@
+16/08 - Criei uma main.c que realiza alguns testes de trocas de contexto.
+	A funcao sched_thread poderia servir como escalonador, o término de todos contextos pede para executar a funcao sched_thread

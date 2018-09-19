@@ -95,6 +95,9 @@ main (void)
     puts("T1");
     // Troco o contexto agora para a thread f3
     swapcontext(&ctx[0], &ctx[3]);
+
+
+
     return 0;
 
 

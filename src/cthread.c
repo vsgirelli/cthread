@@ -1,6 +1,20 @@
 #include "../include/cthread.h"
 #include "../include/config.h"
 /******************************************************************************
+Globais que acho que precisaremos:
+
+
+u_context runningThread: Contexto da thread em execução
+u_context scheduler: Contexto do escalonador, precisamos associar esse contexto ao u_link de cada thread criada
+
+* Filas *
+
+bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos criar o contexto do escalonador e da main, usada para marcar isso!
+
+
+******************************************************************************/
+
+/******************************************************************************
 Parâmetros:
   start: ponteiro para a função que a thread executará.
   arg: um parâmetro que pode ser passado para a thread na sua criação.
@@ -36,7 +50,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     // cria_novathread:
     // Utilizamos a funcao createThread para criar a nova thread
     // Apontando para o scheduler como retorno
-    // Após isso chamar o scheduler
+    // Após isso chamar o scheduler CASO a thread seja de maior prioridade que a atual
 
 
 
@@ -57,6 +71,11 @@ Observações:
 
 ******************************************************************************/
 int cyield(void) {
+    // Coloca  a thread na fila de aptos
+    // Salva o contexto atual
+    // Chama o escalonador
+
+
   return FUNC_NOT_IMPLEMENTED;
 }
 
@@ -75,6 +94,14 @@ Observações:
 
 ******************************************************************************/
 int csetprio(int tid, int prio) {
+
+    // Verificar se a prioridade está dentre as possíveis
+    // POsso aumentar a prioridade da main?
+
+    // Pela  variável global da thread em execução, setar sua prio
+    // Se a prio for < 3  a gente percorre as threads em apto para ver se alguma tem mais prioridade
+    // Se encontrar chama o escalonador!!
+
   return FUNC_NOT_IMPLEMENTED;
 }
 
@@ -102,6 +129,16 @@ Observações:
     (Anotações sobre a cjoin no dúvidas)
 ******************************************************************************/
 int cjoin(int tid) {
+    // Verificar a existência do tid
+    // Verificar se não é um pedido de espera para a main
+
+    // Verificar se não chama para uma thread que já está bloqueando, aqui podemos fazer 2 coisas:
+    // 1 - Criar uma fila com "threads bloqueadoras" e percorrer para ver se nao existe
+    // 2 - Percorrer a fila de threads bloqueadas esperando join para verificar se aquele tid está bloqueando alguma
+
+    // Após isso acho que  é só salvar o contexto e bloquear a thread e eras isso pessoal
+
+
   return FUNC_NOT_IMPLEMENTED;
 }
 

@@ -1,6 +1,0 @@
-# 12/09/18
-
-DONE - Implementar um protótipo incial das funções e .h com códigos de erro.
-Protótipos iniciais apenas retornando códigos de erro.
-
-1 - Análise da EDs fornecidas.

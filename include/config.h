@@ -4,7 +4,6 @@
  *  estados das threads
  */
 
-
 // CÓDIGOS DE ERRO
 // aparentemente, ele quer valores negativos pra erro
 #define FUNC_WORKING 0

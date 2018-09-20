@@ -1,18 +1,10 @@
-#include "../include/cthread.h"
-#include "../include/config.h"
-/******************************************************************************
-Globais que acho que precisaremos:
+/*
+ *  Arquivo com a implementação das funções da biblioteca de thread cthread.
+ */
 
-
-u_context runningThread: Contexto da thread em execução
-u_context scheduler: Contexto do escalonador, precisamos associar esse contexto ao u_link de cada thread criada
-
-* Filas *
-
-bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos criar o contexto do escalonador e da main, usada para marcar isso!
-
-
-******************************************************************************/
+#include "../include/cutils.h"
+// o ideal seria apenas adicionarmos a cthread.h, porém não podemos adicionar
+// lá a cutils.h
 
 /******************************************************************************
 Parâmetros:

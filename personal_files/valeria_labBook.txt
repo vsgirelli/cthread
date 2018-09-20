@@ -1,0 +1,166 @@
+# 12/09/18
+
+-     Leitura do enunciado do trabalho 1 de SISOP:
+Notas sobre pontos importantes:
+
+* Biblioteca de threads N:1 (cthread):
+criação, execução, sync, término, troca de contextos.
+
+* Funções que usam chamadas de sistema existentes no Linux:
+makecontext()
+setcontext()
+getcontext()
+swapcontext()
+
+* Quantidade variável de threads: alocação dinâmica de memória (mconf feelings)
+
+* tid único por thread:
+- inteiro positivo de 32 bits (int 4 bytes)
+- não será necessário reaproveitar tid
+
+* Eventos que colocam threads no estado apto:
+1 - ccreate
+2 - cyield
+3 - após um csignal para uma thread que estava blocked por cwait
+4 - quando uma thread está blocked por cjoin esperando uma thread2, e esta
+terminar
+5 - preempção por prioridade
+
+* Condições que tiram uma thread de executando:
+indo para apto:
+1 - cyield
+2 - ccreate criando uma thread de maior prioridade
+3 - csetprio que diminua sua prioridade para uma prioridade menor do que a de
+uma thread que esteja apta
+4 - csignal que causa o desbloqueio de uma thread de maior prioridade
+indo para bloqueado:
+5 - cjoin
+6 - cwait
+indo para término:
+7 - return ou fm da função que executava
+
+* Eventos que colocam uma thread em blocked:
+1 - cjoin
+2 - cwait (uso de recurso protegido por semáforo)
+
+* Escalonador FIFO PREEMPTIVO POR PRIORIDADE
+Três níveis de prioridade: baixo, médio e alto.
+
+* Respeitar rigorosamente a API indicada no enunciado.
+
+* Possuir códigos de erro para primitivas não funcionais ou não implementadas.
+
+* Anotações das funções no próprio cthread.c
+
+* cjoin e csem_init:
+quando uma thread t1 vai se bloquear por conta de outra thread t2, tem que
+verificar se essa t2 já tem alguém esperando (só uma thread pode se bloquear por
+uma dada thread). Se não houver ninguém bloqueado por causa de t2, então é
+necessário chamar csem_init. A struct s_sem possui um ponteiro pra fila
+(PFILA2), então é basicamente nessa fila que a gente coloca threads que se
+bloqueiam por uma dada thread. Provavelmente seria bom criar filas de semáforos:
+como podem haver diferentes tipos de recursos sendo controlados por semáforos,
+podemos ter por exemplo uma fila de threads que estão bloqueadas por cjoin.
+Nessa fila só haverão semáforos com count = 1 (só uma thread pode se bloquear
+por uma dada thread). Os membros dessa fila podem ser EDs podem ter um id
+(id da thread que está sendo esperada) e um ponteiro pro semáforo que controla
+essa thread. Então por ex:
+t1 chama cjoin esperando t2
+então procura na fila de threads bloqueadas por cjoin se já existe um elemento
+com nome t2 (se já existe uma thread bloqueada esperando t2)
+se não existe, chama csem_init com count = 1
+adiciona esse semáforo pra lista de semáforos pra thread bloqueadas com cjoin
+chama cwait pra botar t1 na fila do semáforo pra t2.
+
+* Sobre semáforos:
+Quando uma t1 chama cwait ou cjoin e o semáforo ainda não existe, tem que
+basicamente inicializar ele com 1 no caso de mutex. Assim, inicializa com 1, e
+em seguida a cwait tem que decrementar o valor do semáforo e testar se é menor
+ou igual a zero, pra saber se bota pra dormir.
+Pra semáforos pra controlar recursos depende, mas sempre chega e decrementa o
+valor do semáforo.
+
+* thread main:
+A thread main é uma thread criada pelo próprio so quando cria o processo.
+A main tbm precisa de um contexto: chamadas getcontext e
+makecontext.
+O tid da main deve ser 0, e possuir um TCB.
+Deve ter a menor prioridade: 0.
+
+
+# 16/09/18
+
+-   Terminando as anotações sobre o enunciado.
+
+- Anotações sobre support.h:
+
+Struct FILA2 (ou PFILA2, ponteiro): estrutura de uma lista. Essa é a estrutura
+que a gente pode usar pra criar todas as listas que temos necessidade.
+Struct NODE2 (ou PNODE2, ponteiro): usada pra TCBs. Então a gente vai ter 3
+filas FILA2 com structs do tipo PNODE2 no estado apto, uma pra cada prioridade.
+
+TCBs são structs do tipo NODE2.
+Tudo o que vai de uma fila pra outra são TCBs. Ou seja, na fila PFILA2 do
+csem_t, o que tem lá é uma fila FILA2 de NODE2 (TCBs).
+
+# 19/09/18
+
+****************************LEIAM AQUI POR FAVOR*******************************
+
+-   Conversamos sobre estrutura das funções.
+* Nosso scheduler apenas seleciona o próximo TCB.  
+
+* Pra mudar de uma lista pra outra temos casos diferentes:
+1 - caso que vai de running pra ready
+
+2 - caso que vai de running pra blocked
+
+3 - caso que vai de blocked pra ready
+
+Pelo que eu pensei, cada caso diferente tem que ser tratado por uma função
+diferente. Elas vão basicamente consistir de salvar o estado de runningThread e
+colocar seu TCB na fila correspondente.
+Sempre após chamar as funções de um desses casos deve-se verificar a necessidade
+de se chamar o escalonador.
+
+
+-   Definição de estruturas, headers e sources:
+Então, a moral é que headers contenham declarações, includes, definições de structs.
+
+Uma struct que a gente criou é a cjoin_thread, em cutils.h.
+A cjoin_thread é a estrutura que contém os tids de uma thread bloqueada por
+cjoin e o tid da thread pela qual a thread se bloqueou. Desse modo, a cada
+chamada de cjoin deve-se verificar se a thread pela qual uma thread quer se
+bloquear já não está bloqueando outra thread. Isso é feito no cutils.c.
+Also, toda vez que uma thread terminar, deve-se percorrer a lista de cjoinQueue
+e verificar se a thread que terminou desbloqueava alguma thread. Ou seja, na
+rotina que o @Pedro (eu acho) ia fazer de terminateThread, tem que verificar
+isso também.
+
+O header cutils.h contém todos os includes. Isso pra centralizar, pra não ter
+múltiplos includes, e pra ficar modular. Qualquer Biblioteca que vocês precisem
+adicionar tem que ser adicionada lá.
+Isso funciona pq os demais arquivos incluem o cutils.h.
+O config.h só é adicionado pelo cutils.h.
+
+Lembrem, então, que as funções do cutils.c que serão utilizadas pela cthread.c 
+devem ter seu protótipo (declaração) adicionado ao cutils.h. O cutils.h é a
+interface da cutils.c que a cthread.c vai usar.
+
+Tem bastante comentários ao longo do código. Leiam tudo pls auehauhe
+
+Lembrem que as funções têm que ter códigos de erro, obrigatoriamente. Pelo que
+eu entendi, TODAS elas. Seguindo o padrão do carissimi, retorno 0 é pra ausência
+de erro. Códigos de erro adicionais devem ser adicionados ao arquivo config.h.
+Also, qualquer código tem que ser adicionado lá. Por exemplo, estado da thread,
+etc. Façam comentários sobre pra quê os códigos servem pls.
+
+Lembrem de não alterar nada dos arquivos que eles dão pra nós na especificação.
+
+Sigam os códigos de vocês a partir dessa versão, criando branches novas pra cada
+funcionalidade. Depois eu merjo (gosto de merjar). Cada funcionalidade da
+biblioteca deve ser uma nova branch.
+
+Desculpa se eu sou bossy, é que eu acho que tenho TOC e sou metódica demais. Se
+eu estiver sendo chata, me avisem. Eu sei que faltou pedir por favor várias
+vezes, mas eu to pedindo implicitamente e de forma não grossa hehe :)

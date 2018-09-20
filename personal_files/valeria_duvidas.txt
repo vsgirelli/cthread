@@ -1,0 +1,83 @@
+# 12/09/18
+
+-     Leitura do enunciado do trabalho 1 de SISOP:
+
+* tid único por thread: OK
+Qual algoritmo utilizar para geração desse tid?
+
+
+* como vai funcionar de fato a cjoin?
+
+
+* ccreate: OK
+O enunciado diz que deve ser preemptivo, ou seja, quando uma thread for criada e
+possuir prioridade maior do que a thread que está sendo executada (aka, thread
+que acabou de criar uma thread de maior prioridade), a thread deve ser
+preemptava e deve ceder o CPU para a recém criada thread de maior prioridade. No
+entanto, o escalonador é do tipo FIFO, ou seja, a thread recém criada deveria ir
+para o fim da fila de apto, certo? Or i got it wrong?
+
+* cjoin: OK
+Quando uma thread terminar e desbloquear outra, o escalonador deve levar em
+conta prioridades pra selecionar a próxima thread. Como assim? Significa que se
+a thread que estiver bloqueada tiver uma prio baixa, ela é desbloqueada e só vai
+pra FIFO? Daí se ela tiver uma prioridade mais alta que todas as da FIFO ela vai
+direto pro CPU?
+(Lembrando que o escalonador é FIFO por prioridade, ou seja, se a gente fizer
+uma única fila de aptos, ela deve estar ordenada por prioridade. Eu prefiro
+fazer 3 listas ordenadas por ordem de chegada, fica mais intuitivo e mais fácil
+de trabalhar.)
+
+* cjoin: OK
+Recebe como param o tid cujo término está sendo aguardado.
+Então:
+tid1 chama cjoin passando tid2
+tid é posta pra blocked
+quando a tid2 terminar, cjoin tem que retornar um valor de retorno da execução
+de tdi2
+porém, como ter controle disso? porque a cjoin teria que ser empilhada e salva
+em seu estado atual:
+cjoin(..) {
+  bloqueia tid1
+  chama direto a tid2 ou chama escalonador?
+    se chama direto a tid2, como é que a função tem acesso à lista de aptos pra
+chamar direto a tid2?
+    se chama o escalonador, ele pode escolher qualquer outra thread, não
+necessariamente a tid2, então a gente teria que salvar o estado da cjoin, pra
+que quando a tid2 fosse executada ela retornasse pro ponto da cjoin em que
+retorna:
+
+  executa a tid2 e recebe seu valor de retorno
+  retorna um valor indicando sucesso ou não de tdi2
+
+  outro problema: esse valor de retorno vai pra onde? como ele desbloqueia a
+tid1? 
+  help (sepa isso é explicado ao longo do enunciado tbm)
+  ()
+} 
+
+* sobre a cidentify. OK
+
+* Uma thread pode aumentar sua prioridade?
+
+* No caso de uma thread fazer cyield mas ela ser a única de alta prioridade, ela
+  seria posta pra executar de novo ou o escalonador deve dar chance pra outras
+  threads de baixa prioridade?
+
+* cjoin:
+e se a blocking thread for a main? error? 
+
+* scheduler:
+o modelo de scheduler funciona pra ccreate, cyield e csetprio (caso haja
+preempção).
+No entanto, ele não funciona pra chamadas que bloqueiam threads, só pra chamadas
+que preemptam e botam pra apto.
+Uma solução é criar funções genéricas pra cada um, por ex:
+
+ccreate, cyield e csetprio: salva contexto atual e bota pra apto.
+chama scheduler pra selecionar a próxima thread a ser posta em executando.
+
+pra chamadas bloqueantes: salva o contexto atual e bota pra bloqueado.
+chama scheduler pra selecionar a próxima thread a ser posta em executando.
+
+* 3 filas pra blocked?

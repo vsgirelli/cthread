@@ -105,4 +105,62 @@ csem_t, o que tem lá é uma fila FILA2 de NODE2 (TCBs).
 
 # 19/09/18
 
--     
+****************************LEIAM AQUI POR FAVOR*******************************
+
+-   Conversamos sobre estrutura das funções.
+* Nosso scheduler apenas seleciona o próximo TCB.  
+
+* Pra mudar de uma lista pra outra temos casos diferentes:
+1 - caso que vai de running pra ready
+
+2 - caso que vai de running pra blocked
+
+3 - caso que vai de blocked pra ready
+
+Pelo que eu pensei, cada caso diferente tem que ser tratado por uma função
+diferente. Elas vão basicamente consistir de salvar o estado de runningThread e
+colocar seu TCB na fila correspondente.
+Sempre após chamar as funções de um desses casos deve-se verificar a necessidade
+de se chamar o escalonador.
+
+
+-   Definição de estruturas, headers e sources:
+Então, a moral é que headers contenham declarações, includes, definições de structs.
+
+Uma struct que a gente criou é a cjoin_thread, em cutils.h.
+A cjoin_thread é a estrutura que contém os tids de uma thread bloqueada por
+cjoin e o tid da thread pela qual a thread se bloqueou. Desse modo, a cada
+chamada de cjoin deve-se verificar se a thread pela qual uma thread quer se
+bloquear já não está bloqueando outra thread. Isso é feito no cutils.c.
+Also, toda vez que uma thread terminar, deve-se percorrer a lista de cjoinQueue
+e verificar se a thread que terminou desbloqueava alguma thread. Ou seja, na
+rotina que o @Pedro (eu acho) ia fazer de terminateThread, tem que verificar
+isso também.
+
+O header cutils.h contém todos os includes. Isso pra centralizar, pra não ter
+múltiplos includes, e pra ficar modular. Qualquer Biblioteca que vocês precisem
+adicionar tem que ser adicionada lá.
+Isso funciona pq os demais arquivos incluem o cutils.h.
+O config.h só é adicionado pelo cutils.h.
+
+Lembrem, então, que as funções do cutils.c que serão utilizadas pela cthread.c 
+devem ter seu protótipo (declaração) adicionado ao cutils.h. O cutils.h é a
+interface da cutils.c que a cthread.c vai usar.
+
+Tem bastante comentários ao longo do código. Leiam tudo pls auehauhe
+
+Lembrem que as funções têm que ter códigos de erro, obrigatoriamente. Pelo que
+eu entendi, TODAS elas. Seguindo o padrão do carissimi, retorno 0 é pra ausência
+de erro. Códigos de erro adicionais devem ser adicionados ao arquivo config.h.
+Also, qualquer código tem que ser adicionado lá. Por exemplo, estado da thread,
+etc. Façam comentários sobre pra quê os códigos servem pls.
+
+Lembrem de não alterar nada dos arquivos que eles dão pra nós na especificação.
+
+Sigam os códigos de vocês a partir dessa versão, criando branches novas pra cada
+funcionalidade. Depois eu merjo (gosto de merjar). Cada funcionalidade da
+biblioteca deve ser uma nova branch.
+
+Desculpa se eu sou bossy, é que eu acho que tenho TOC e sou metódica demais. Se
+eu estiver sendo chata, me avisem. Eu sei que faltou pedir por favor várias
+vezes, mas eu to pedindo implicitamente e de forma não grossa hehe :)

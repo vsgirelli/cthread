@@ -79,3 +79,5 @@ chama scheduler pra selecionar a próxima thread a ser posta em executando.
 
 pra chamadas bloqueantes: salva o contexto atual e bota pra bloqueado.
 chama scheduler pra selecionar a próxima thread a ser posta em executando.
+
+* 3 filas pra blocked?

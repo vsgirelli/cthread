@@ -164,3 +164,14 @@ biblioteca deve ser uma nova branch.
 Desculpa se eu sou bossy, é que eu acho que tenho TOC e sou metódica demais. Se
 eu estiver sendo chata, me avisem. Eu sei que faltou pedir por favor várias
 vezes, mas eu to pedindo implicitamente e de forma não grossa hehe :)
+
+
+
+# 21/09/18
+
+-     Usando -m32 pra compilar pra 32 bits em amd64:
+Pra compilar pra 32 bits na minha máquina, eu tenho que botar -m32 como flag
+(já add ao makefile). Dá erro e precisa instalar a libc6-dev-i386. Erro tbm com 
+a ucontext.h. Só instalar libx32gcc-4.8-dev.
+
+-     Usar setter e getters pra acessar as variáveis da cutils.

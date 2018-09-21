@@ -174,4 +174,7 @@ Pra compilar pra 32 bits na minha máquina, eu tenho que botar -m32 como flag
 (já add ao makefile). Dá erro e precisa instalar a libc6-dev-i386. Erro tbm com 
 a ucontext.h. Só instalar libx32gcc-4.8-dev.
 
--     Usar setter e getters pra acessar as variáveis da cutils.
+-     Usar setter e getters pra acessar as variáveis da cutils. Ou não kk.
+
+
+-     Arrumamos o makefile e adicionamos os .o ao repositório.

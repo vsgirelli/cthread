@@ -31,7 +31,9 @@ bin/cthread.o: src/cthread.c
 	gcc -m32 -c src/cthread.c -o bin/cthread.o -Wall
 
 clean:
+	mv $(BIN_DIR)/support.o ../
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
+	mv ../support.o $(BIN_DIR)
 
 tests:
 	$(MAKE) -C testes

@@ -29,8 +29,8 @@ FILA2 readyQueuePrio2;
 // temos o problema da prioridade na hora de tirar de blocked pra apto 
 // vou consultar o carissimi sobre isso, mas não é problema por enquanto
 FILA2 blockedQueue;
-FILA2 suspenseReadyQueue;
-FILA2 suspenseBlockedQueue;
+FILA2 suspendedReadyQueue;
+FILA2 suspendedBlockedQueue;
 
 // fila de TCBs bloqueados por cjoin
 FILA2 cjoinQueue;
@@ -47,17 +47,17 @@ TCB_t mainThread;
 // todos 32 bits
 int numTID = 0;
 
-// verificar se a mainThread já existe
-int checkMainThread();
-
-// setta a prio da runningThread
-void setRunningThreadPrio(int prio);
-
-// retorna a prio da runningThread
-int getRunningThreadPrio();
-
 // Pedro isso é contigo
 ucontext_t endExecSchedulerContext;
+
+int searchThread(int tid) {
+  // primeiro procura pela thread na lista de cjoinQueue
+  // se já ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING
+  // senão, procura nas demais listas
+}
+
+// verificar se a mainThread já existe
+int checkMainThread();
 
 void createThread();
 
@@ -68,10 +68,13 @@ void createTID();
 // runningThread->context = getContext()
 // salva o contexto em Execução
 
-// AppendFila2(blockedQueue, runningThread) (ou AppendFila2(cjoinQueue, runningThread))
+// AppendFila2(blockedQueue, runningThread) (ou 
 // salva na fila de aptos a thread que vai ser preemptada
 void moveRunningToBlocked(); // ou cjoinQueue
 
+int moveRunningToCjoin() {
+  AppendFila2(cjoinQueue, runningThread);
+}
 
 // moveRunningToReady()
 // runningThread->context = getContext()

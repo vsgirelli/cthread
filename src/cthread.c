@@ -25,6 +25,7 @@ Observações:
   * Quando um thread de maior prioridade for criada, a thread criadora deve ser preemptada.
 
 ******************************************************************************/
+
 int ccreate (void* (*start)(void*), void *arg, int prio) {
   if(checkMainThread() != 0 )
     initialCreate();
@@ -136,17 +137,35 @@ Observações:
     (Anotações sobre a cjoin no dúvidas e no labbook)
 ******************************************************************************/
 int cjoin(int tid) {
-    // Verificar a existência do tid pelo qual se quer bloquear
-    // Verificar se não é um pedido de espera para a main (erro?)
+  cjoin_thread *cjt;
 
-    // Verificar se não chama para uma thread que já está bloqueando:
-    // se, em cjoinQueue, existir um nó cujo blockingTID == tid
-    // então retorna erro
-    // senão, AppendFila2(cjoinQueue, novo nó)
-    // o novo nó irá possuir o tid e o runningThread->tid
+  if(mainThread == NULL) {
+    if (initialCreate() != 0) {
+      // TODO criar código pra erro de inicialização de fila
+    }
+    // se a thread main não existia, significa que não existia mais nenhuma thread
+    // então pode restornar erro de THREAD_NOT_FOUND
+    return THREAD_NOT_FOUND;
+  }
 
-    // chama função que salva o contexto e bota o TCB pra bloqueado
-    // chama scheduler pra selecionar próxima thread.
+  // Verificar se a thread já bloqueia alguém
+  // e depois verifica a existência do tid pelo qual se quer bloquear
+  if(searchThread(tid) == THREAD_ALREADY_BLOCKING) {
+    return THREAD_ALREADY_BLOCKING;
+  }
+  else if (searchThread(tid) == THREAD_NOT_FOUND) {
+    return THREAD_NOT_FOUND;
+  }
+  
+  // TODO Verificar se não é um pedido de espera para a main (erro?)
+
+  cjt = (cjoin_thread*) malloc(sizeof(cjoin_thread));
+  cjt->blockedTID = runningThread->tid;
+  cjt->blockingTID = tid;
+  AppendFila2(cjoinQueue, cjt);
+
+  // chama função que salva o contexto e bota o TCB pra bloqueado
+  // chama scheduler pra selecionar próxima thread.
   return FUNC_NOT_IMPLEMENTED;
 }
 

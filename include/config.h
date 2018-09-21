@@ -17,7 +17,8 @@
  * Caso uma prioridade diferente for informada, informar código de erro.
  */
 #define PRIO_ERROR -3
-
+// thread de um dado tid não existe
+#define THREAD_NOT_FOUND -4
 
 // CÓDIGOS DE PRIORIDADE
 #define PRIO_0 0

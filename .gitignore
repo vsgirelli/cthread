@@ -20,7 +20,7 @@ tags
 *.d
 
 # Object files
-*.o
+# *.o
 *.ko
 *.obj
 *.elf

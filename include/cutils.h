@@ -17,7 +17,7 @@
 #include "../include/support.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <ucontext_t.h>
+#include <ucontext.h>
 #include <string.h>
 
 // struct com o tid bloqueado e com o tid bloqueador das threads por efeito de
@@ -28,5 +28,8 @@ typedef struct cjt {
 } cjoin_thread;
 
 // TODO atualizar a declaração de acordo com a última versão das funções.
-void scheduler();
-void initialCreate();
+void scheduler(void);
+void initialCreate(void);
+int checkMainThread(void);
+void setRunningThreadPrio(int prio);
+int getRunningThreadPrio(void);

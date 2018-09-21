@@ -47,13 +47,22 @@ TCB_t mainThread;
 // todos 32 bits
 int numTID = 0;
 
+// verificar se a mainThread já existe
+int checkMainThread();
+
+// setta a prio da runningThread
+void setRunningThreadPrio(int prio);
+
+// retorna a prio da runningThread
+int getRunningThreadPrio();
+
 // Pedro isso é contigo
 ucontext_t endExecSchedulerContext;
 
-createThread();
+void createThread();
 
 // lembrar de incrementar
-createTID();
+void createTID();
 
 // moveRunningToBlocked (ou Cjoin):
 // runningThread->context = getContext()
@@ -61,7 +70,7 @@ createTID();
 
 // AppendFila2(blockedQueue, runningThread) (ou AppendFila2(cjoinQueue, runningThread))
 // salva na fila de aptos a thread que vai ser preemptada
-moveRunningToBlocked(); // ou cjoinQueue
+void moveRunningToBlocked(); // ou cjoinQueue
 
 
 // moveRunningToReady()
@@ -70,7 +79,7 @@ moveRunningToBlocked(); // ou cjoinQueue
 
 // AppendFila2(readyQueuePrioX, runningThread)
 // salva na fila de aptos a thread que vai ser preemptada
-moveRunningToReady();
+void moveRunningToReady();
 
 // SCHEDULER:
 // seleciona a nova thread a ser executada (genérico pra qualquer troca de contexto)
@@ -83,12 +92,12 @@ moveRunningToReady();
 
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
-scheduler() ;
+void scheduler() ;
 
 // cria main
 // inicializar as filas (support.h)
 // cria contexto pra chamada da terminateThread
-initialCreate();
+void initialCreate();
 
 /*
  * todas as thread devem ser ligadas a essa função.
@@ -96,5 +105,5 @@ initialCreate();
  * pra liberar recursos e o tcb, e posteriormente chamar o escalonador.
  * Tem que verificar se a thread terminada bloqueava alguém.
  */
-terminateThread();
+void terminateThread();
 

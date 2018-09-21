@@ -26,8 +26,8 @@ Observações:
 
 ******************************************************************************/
 int ccreate (void* (*start)(void*), void *arg, int prio) {
-  if(tcb main == NULL)
-    initialCreate;
+  if(checkMainThread() != 0 )
+    initialCreate();
 
     // Verifica prioridade
    if (prio != PRIO_0 && prio != PRIO_1 && prio != PRIO_2) {
@@ -93,11 +93,11 @@ int csetprio(int tid, int prio) {
   }
   // POsso aumentar a prioridade da main?
 
-  runningThread->prio = prio;
+  setRunningThreadPrio(prio);
   // if the new priority is lower than the higher priority,
   // then check if there is any thread with higher priority,
   // if so, the current thread must suffer preemption.
-  if (runningThread->prio < PRIO_2) {
+  if (getRunningThreadPrio() < PRIO_2) {
     // usar as funções da support.h pra percorrer as listas
     // verifica na fila de prio 2
     //    se achou, chama função que salva o contexto e bota o TCB pra o apto

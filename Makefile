@@ -16,18 +16,25 @@ INC_DIR=./include
 BIN_DIR=./bin
 SRC_DIR=./src
 
-all: regra1 regra2 regran
+# bibliotecas extras (tipo math.h) que forem adicionadas
+# LIBS=
 
-regra1: #dependências para a regra1
-	$(CC) -o $(BIN_DIR)regra1 $(SRC_DIR)regra1.c -Wall
+OBJS=bin/support.o bin/cutils.o bin/cthread.o
 
-regra2: #dependências para a regra2
-	$(CC) -o $(BIN_DIR)regra2 $(SRC_DIR)regra2.c -Wall
+all: bin/cutils.o bin/cthread.o
+	ar crs lib/libcthread.a $(OBJS)
 
-regran: #dependências para a regran
-	$(CC) -o $(BIN_DIR)regran $(SRC_DIR)regran.c -Wall
+bin/cutils.o: src/cutils.c
+	gcc -m32 -c src/cutils.c -o bin/cutils.o -Wall
+
+bin/cthread.o: src/cthread.c
+	gcc -m32 -c src/cthread.c -o bin/cthread.o -Wall
 
 clean:
 	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
 
+tests:
+	$(MAKE) -C testes
 
+tests_clean:
+	$(MAKE) -C testes clean

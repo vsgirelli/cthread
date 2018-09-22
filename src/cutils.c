@@ -20,11 +20,63 @@ bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos cria
 
 ******************************************************************************/
 
-int searchThread(int tid) {
-  // primeiro procura pela thread na lista de cjoinQueue
-  // se já ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING
-  // senão, procura nas demais listas
-  return FUNC_NOT_IMPLEMENTED;
+// procurar thread em uma determinada lista
+// retorna THREAD_NOT_FOUND ou se encontrou 0
+int searchThread(PFILA2 queue, int tid){
+	TCB_t *pThread;
+	FirstFila2(queue);			
+	pThread = (TCB_t*) GetAtIteratorFila2(queue);
+	while(pThread != NULL){
+		if(pThread->tid == tid){
+			// found thread and return
+			return 0;
+		} else{
+			// otherwise, keep searching
+			NextFila2(queue);
+			pThread = (TCB_t*) GetAtIteratorFila2(queue);
+		}
+	}
+	return THREAD_NOT_FOUND;		
+}
+
+// verifica se a thread ja esta bloqueando alguem
+// se nao bloqueia ninguem retorna 0 
+// caso contrario, THREAD_ALREADY_BLOCKING
+int checkThreadBlocking(PFILA2 queue, int tid){
+	cjoin_thread *pCjoin_thread;
+	FirstFila2(queue);
+	pCjoin_thread = (cjoin_thread*) GetAtIteratorFila2(queue);
+	while(pCjoin_thread != NULL){
+		if(pCjoin_thread->blockingTID == tid){			
+			return THREAD_ALREADY_BLOCKING;
+		} else{	
+			NextFila2(queue);
+			pCjoin_thread = (cjoin_thread*) GetAtIteratorFila2(queue);
+		}	
+	}
+	return 0;
+}
+
+// verifica se eh possivel bloquear a thread referenciada por esse tid
+// 0 se eh possivel
+// caso contrario, erro:
+//  THREAD_ALREADY_BLOCKING
+//  THREAD_NOT_FOUND
+int canBlock(int tid) {
+    // primeiro procura pela thread na lista de cjoinQueue
+    // se já ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING    
+    if(checkThreadBlocking(cjoinQueue, tid) != 0)
+        return THREAD_ALREADY_BLOCKING;
+    // senão, procura nas demais listas
+    if(searchThread(readyQueuePrio0, tid) == 0)
+        return 0;
+    if(searchThread(readyQueuePrio1, tid) == 0)
+        return 0;
+    if(searchThread(readyQueuePrio2, tid) == 0)
+        return 0;
+    if(searchThread(blockedQueue, tid) == 0)
+        return 0;
+    return THREAD_NOT_FOUND;
 }
 
 // verificar se a mainThread já existe
@@ -44,8 +96,8 @@ void createTID();
 void moveRunningToBlocked(); // ou cjoinQueue
 
 int moveRunningToCjoin() {
-  AppendFila2(&cjoinQueue, runningThread);
-  return FUNC_NOT_IMPLEMENTED;
+    AppendFila2(&cjoinQueue, runningThread);
+    return FUNC_NOT_IMPLEMENTED;
 }
 
 // moveRunningToReady()

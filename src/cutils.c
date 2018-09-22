@@ -4,6 +4,13 @@
  */
 
 #include "../include/cutils.h"
+#include "../include/config.h"
+#include "../include/cdata.h"
+#include "../include/support.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <ucontext.h>
+#include <string.h>
 
 // PEDRO THINGS (remove o que tu acha que é removível Pebronha)
 /******************************************************************************
@@ -24,7 +31,7 @@ int searchThread(int tid) {
   // primeiro procura pela thread na lista de cjoinQueue
   // se já ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING
   // senão, procura nas demais listas
-  return FUNC_NOT_IMPLEMENTED;
+  return 0;
 }
 
 // verificar se a mainThread já existe
@@ -41,11 +48,12 @@ void createTID();
 
 // AppendFila2(blockedQueue, runningThread) (ou 
 // salva na fila de aptos a thread que vai ser preemptada
-void moveRunningToBlocked(); // ou cjoinQueue
+int moveRunningToBlocked() {
+  if (AppendFila2(&blockedQueue, runningThread) != 0) {
+    return APPEND_ERROR;
+  }
 
-int moveRunningToCjoin() {
-  AppendFila2(&cjoinQueue, runningThread);
-  return FUNC_NOT_IMPLEMENTED;
+  return 0;
 }
 
 // moveRunningToReady()
@@ -67,12 +75,18 @@ void moveRunningToReady();
 
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
-void scheduler() ;
+int scheduler() {
+  return FUNC_NOT_IMPLEMENTED;
+}
 
 // cria main
 // inicializar as filas (support.h)
-// cria contexto pra chamada da terminateThread
-int initialCreate();
+// cria contexto pra chamada da terminateThread e do scheduler
+int initialCreate() {
+  printf("initialCreate called\n");
+
+  return 0;
+}
 
 /*
  * todas as thread devem ser ligadas a essa função.
@@ -82,3 +96,32 @@ int initialCreate();
  */
 void terminateThread();
 
+/*
+void createThreads() {
+    TCB_t * t1 = (TCB_t*)malloc(sizeof(TCB_t));
+    TCB_t * t2 = (TCB_t*)malloc(sizeof(TCB_t));
+
+    // thread 1
+    t1->tid = 0;
+    t1->prio = 0;
+    t1->state = THREAD_STATE_RUNNING;
+    getcontext(t1->context);
+    
+    getcontext(&(t1->context));
+    t1->context.uc_link = &terminateThread;
+    t1->context.uc_stack.ss_sp = (char*)malloc(SIGSTKSZ);
+    t1->context.uc_stack.ss_size = SIGSTKSZ;
+    makecontext(&(t1->context), (void(*)(void))start, 1, arg);
+
+    // thread 2
+    t2->tid = 0;
+    t2->prio = 0;
+    t2->state = THREAD_STATE_READY;
+    getcontext(t2->context);
+    
+    getcontext(&(t2->context));
+    t2->context.uc_link = &terminateThread;
+    t2->context.uc_stack.ss_sp = (char*)malloc(SIGSTKSZ);
+    t2->context.uc_stack.ss_size = SIGSTKSZ;
+    makecontext(&(t2->context), (void(*)(void))start, 1, arg);
+}*/

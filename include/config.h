@@ -20,6 +20,7 @@
 // thread de um dado tid não existe
 #define THREAD_NOT_FOUND -4
 #define THREAD_ALREADY_BLOCKING -5
+#define APPEND_ERROR -6
 
 // CÓDIGOS DE PRIORIDADE
 #define PRIO_0 0

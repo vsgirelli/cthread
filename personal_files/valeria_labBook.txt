@@ -178,3 +178,14 @@ a ucontext.h. Só instalar libx32gcc-4.8-dev.
 
 
 -     Arrumamos o makefile e adicionamos os .o ao repositório.
+
+
+
+# 22/09/18
+
+-     Na casa do Pedro pra fazer o trabson.
+
+-     Pro caso de threads bloqueadas por um semáforo, a fila do semáforo é só
+      pra gerenciamento de que threads estão aguardando pelo semáforo, ela
+      não bloqueia nada. As threads devem ser postas de qualquer forma pra lista
+de blocked.

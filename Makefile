@@ -21,7 +21,7 @@ SRC_DIR=./src
 OBJS=$(BIN_DIR)/support.o $(BIN_DIR)/cutils.o $(BIN_DIR)/cthread.o
 
 all: $(BIN_DIR)/cutils.o $(BIN_DIR)/cthread.o
-	ar crs $(LIB_DIR)/$(LIB_DIR)cthread.a $(OBJS)
+	ar crs $(LIB_DIR)/libcthread.a $(OBJS)
 
 $(BIN_DIR)/cutils.o: $(SRC_DIR)/cutils.c
 	gcc -m32 -c $(SRC_DIR)/cutils.c -o $(BIN_DIR)/cutils.o -Wall

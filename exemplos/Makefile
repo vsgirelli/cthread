@@ -10,6 +10,9 @@ all: exemplo mandel teste_vetor barbeiro filosofos prodcons series
 exemplo: exemplo.c $(LIB_DIR)/libcthread.a
 	$(CC) -o exemplo exemplo.c -L$(LIB_DIR) -lcthread -Wall
 
+teste: main.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste main.c -L$(LIB_DIR) -lcthread -Wall
+
 teste_vetor: teste_vetor.c $(LIB_DIR)/libcthread.a
 	$(CC) -o teste_vetor teste_vetor.c -L$(LIB_DIR) -lcthread -Wall
 

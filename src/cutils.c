@@ -20,40 +20,11 @@ bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos cria
 
 ******************************************************************************/
 
-
-// 3 listas pra TCBs de threads em estado apto, de acordo com prioridade
-FILA2 readyQueuePrio0;
-FILA2 readyQueuePrio1;
-FILA2 readyQueuePrio2;
-
-// temos o problema da prioridade na hora de tirar de blocked pra apto 
-// vou consultar o carissimi sobre isso, mas não é problema por enquanto
-FILA2 blockedQueue;
-FILA2 suspendedReadyQueue;
-FILA2 suspendedBlockedQueue;
-
-// fila de TCBs bloqueados por cjoin
-FILA2 cjoinQueue;
-
-// TCB da thread que está no estado executando
-// verificar se essa tem que ser ponteiro ou não
-TCB_t *runningThread;
-
-// verificar se essa tem que ser ponteiro ou não
-TCB_t mainThread;
-
-// contador pra atribuir o TID
-// thread main deve ser TID 0
-// todos 32 bits
-int numTID = 0;
-
-// Pedro isso é contigo
-ucontext_t endExecSchedulerContext;
-
 int searchThread(int tid) {
   // primeiro procura pela thread na lista de cjoinQueue
   // se já ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING
   // senão, procura nas demais listas
+  return FUNC_NOT_IMPLEMENTED;
 }
 
 // verificar se a mainThread já existe
@@ -73,7 +44,8 @@ void createTID();
 void moveRunningToBlocked(); // ou cjoinQueue
 
 int moveRunningToCjoin() {
-  AppendFila2(cjoinQueue, runningThread);
+  AppendFila2(&cjoinQueue, runningThread);
+  return FUNC_NOT_IMPLEMENTED;
 }
 
 // moveRunningToReady()
@@ -100,7 +72,7 @@ void scheduler() ;
 // cria main
 // inicializar as filas (support.h)
 // cria contexto pra chamada da terminateThread
-void initialCreate();
+int initialCreate();
 
 /*
  * todas as thread devem ser ligadas a essa função.

@@ -162,7 +162,7 @@ int cjoin(int tid) {
   cjt = (cjoin_thread*) malloc(sizeof(cjoin_thread));
   cjt->blockedTID = runningThread->tid;
   cjt->blockingTID = tid;
-  AppendFila2(cjoinQueue, cjt);
+  AppendFila2(&cjoinQueue, cjt);
 
   // chama função que salva o contexto e bota o TCB pra bloqueado
   // chama scheduler pra selecionar próxima thread.

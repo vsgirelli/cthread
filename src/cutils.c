@@ -21,7 +21,8 @@ bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos cria
 ******************************************************************************/
 
 // procurar thread em uma determinada lista
-// retorna THREAD_NOT_FOUND ou se encontrou 0
+// se encontrou retorna 0
+// caso contrario, retorna THREAD_NOT_FOUND
 int searchThread(PFILA2 queue, int tid){
 	TCB_t *pThread;
 	FirstFila2(queue);			

@@ -62,4 +62,4 @@ int initialCreate(void);
 int checkMainThread(void);
 void setRunningThreadPrio(int prio);
 int getRunningThreadPrio(void);
-int searchThread(int tid);
+int canBlock(int tid);

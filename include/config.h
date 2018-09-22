@@ -3,6 +3,8 @@
  *  valores de prioridade,
  *  estados das threads
  */
+#ifndef __cconfig__
+#define __cconfig__
 
 // CÓDIGOS DE ERRO
 // aparentemente, ele quer valores negativos pra erro
@@ -35,3 +37,5 @@
 #define THREAD_STATE_FINISHED 4
 #define THREAD_STATE_SUSPENDED_READY 5
 #define THREAD_STATE_SUSPENDED_BLOCKED 6
+
+#endif

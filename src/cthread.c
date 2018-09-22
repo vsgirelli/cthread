@@ -1,8 +1,12 @@
 /*
  *  Arquivo com a implementação das funções da biblioteca de thread cthread.
  */
-
+#include "../include/support.h"
+#include "../include/cdata.h"
+#include "../include/config.h"
 #include "../include/cutils.h"
+#include "../include/cthread.h"
+//#include "../include/cutils.h"
 // o ideal seria apenas adicionarmos a cthread.h, porém não podemos adicionar
 // lá a cutils.h
 
@@ -26,14 +30,34 @@ Observações:
 
 ******************************************************************************/
 
-int ccreate (void* (*start)(void*), void *arg, int prio) {
-  if(checkMainThread() != 0 )
-    initialCreate();
+int ccreate (void* (*start)(void*), void *arg, int prio)
+{
+
+    int tid;
+    TCB_t* newThread = NULL;
+    if(checkMainThread() != 0 )
+        initialCreate();
 
     // Verifica prioridade
-   if (prio != PRIO_0 && prio != PRIO_1 && prio != PRIO_2) {
-     return PRIO_ERROR;
-   }
+    if (prio < PRIO_0 || prio > PRIO_2)
+    {
+        return PRIO_ERROR;
+    }
+
+    tid = createTID();
+
+    newThread = createThread(start, arg, prio, tid);
+
+    if (newThread->prio > runningThread->prio)
+    {
+        scheduler();
+    } else {
+
+        moveToList(newThread);
+
+    }
+
+
     // http://pubs.opengroup.org/onlinepubs/009695299/functions/makecontext.html
     // Prioridade dentro dos padrões, próximos passos:
     // Verificar se a thread main foi criada, 2 casos possíveis:
@@ -41,17 +65,17 @@ int ccreate (void* (*start)(void*), void *arg, int prio) {
     //           podemos criar uma funcao createThread(u_context, func, arg)
     //       2 - Caso exista prosseguimos para cria_novathread:
 
-   // novo tid
-   // criar contexto nova thread (linkar pra rotina de terminateThread)
-   // criar tcb nova thread
-   // linkar contexto ao TCB
-   // Verificar se prio > runningThread->prio
-   //     se sim, chama função que salva o contexto atual e bota o TCB pra o apto
-   //             chama scheduler pra selecionar próxima thread.
-   //     se não, adicionar para a fila certa de apto
+    // novo tid
+    // criar contexto nova thread (linkar pra rotina de terminateThread)
+    // criar tcb nova thread
+    // linkar contexto ao TCB
+    // Verificar se prio > runningThread->prio
+    //     se sim, chama função que salva o contexto atual e bota o TCB pra o apto
+    //             chama scheduler pra selecionar próxima thread.
+    //     se não, adicionar para a fila certa de apto
     // retorna ok
 
-  return FUNC_NOT_IMPLEMENTED;
+    return tid;
 }
 
 /******************************************************************************
@@ -67,11 +91,12 @@ Observações:
   * Escalonador deve ser chamado para selecionar a próxima thread.
 
 ******************************************************************************/
-int cyield(void) {
+int cyield(void)
+{
     // chama função que salva o contexto e bota o TCB pra o apto
     // chama scheduler pra selecionar próxima thread.
 
-  return FUNC_NOT_IMPLEMENTED;
+    return FUNC_NOT_IMPLEMENTED;
 }
 
 /******************************************************************************
@@ -88,17 +113,19 @@ Observações:
   thread chamadora.
 
 ******************************************************************************/
-int csetprio(int tid, int prio) {
-  if (prio != PRIO_0 && prio != PRIO_1 && prio != PRIO_2) {
-    return PRIO_ERROR;
-  }
-  // POsso aumentar a prioridade da main?
+int csetprio(int tid, int prio)
+{
+    if (prio < PRIO_0 || prio > PRIO_2)
+    {
+        return PRIO_ERROR;
+    }
+    // POsso aumentar a prioridade da main?
 
-  setRunningThreadPrio(prio);
-  // if the new priority is lower than the higher priority,
-  // then check if there is any thread with higher priority,
-  // if so, the current thread must suffer preemption.
-  if (getRunningThreadPrio() < PRIO_2) {
+// setRunningThreadPrio(prio);
+    // if the new priority is lower than the higher priority,
+    // then check if there is any thread with higher priority,
+    // if so, the current thread must suffer preemption.
+    //if (getRunningThreadPrio() < PRIO_2) {
     // usar as funções da support.h pra percorrer as listas
     // verifica na fila de prio 2
     //    se achou, chama função que salva o contexto e bota o TCB pra o apto
@@ -108,9 +135,9 @@ int csetprio(int tid, int prio) {
     //              chama scheduler pra selecionar próxima thread.
     // se não achou em 2 e em 1, então não preempta, pq não há nenhuma thread de
     // prioridade maior
-  }
+    //}
 
-  return FUNC_NOT_IMPLEMENTED;
+    return FUNC_NOT_IMPLEMENTED;
 }
 
 /******************************************************************************
@@ -136,37 +163,42 @@ Observações:
 
     (Anotações sobre a cjoin no dúvidas e no labbook)
 ******************************************************************************/
-int cjoin(int tid) {
-  cjoin_thread *cjt;
+int cjoin(int tid)
+{
+    cjoin_thread *cjt;
 
-  if(mainThread == NULL) {
-    if (initialCreate() != 0) {
-      // TODO criar código pra erro de inicialização de fila
+    if(mainThread == NULL)
+    {
+        if (initialCreate() != 0)
+        {
+            // TODO criar código pra erro de inicialização de fila
+        }
+        // se a thread main não existia, significa que não existia mais nenhuma thread
+        // então pode restornar erro de THREAD_NOT_FOUND
+        return THREAD_NOT_FOUND;
     }
-    // se a thread main não existia, significa que não existia mais nenhuma thread
-    // então pode restornar erro de THREAD_NOT_FOUND
-    return THREAD_NOT_FOUND;
-  }
 
-  // Verificar se a thread já bloqueia alguém
-  // e depois verifica a existência do tid pelo qual se quer bloquear
-  if(searchThread(tid) == THREAD_ALREADY_BLOCKING) {
-    return THREAD_ALREADY_BLOCKING;
-  }
-  else if (searchThread(tid) == THREAD_NOT_FOUND) {
-    return THREAD_NOT_FOUND;
-  }
-  
-  // TODO Verificar se não é um pedido de espera para a main (erro?)
+    // Verificar se a thread já bloqueia alguém
+    // e depois verifica a existência do tid pelo qual se quer bloquear
+    if(searchThread(tid) == THREAD_ALREADY_BLOCKING)
+    {
+        return THREAD_ALREADY_BLOCKING;
+    }
+    else if (searchThread(tid) == THREAD_NOT_FOUND)
+    {
+        return THREAD_NOT_FOUND;
+    }
 
-  cjt = (cjoin_thread*) malloc(sizeof(cjoin_thread));
-  cjt->blockedTID = runningThread->tid;
-  cjt->blockingTID = tid;
-  AppendFila2(&cjoinQueue, cjt);
+    // TODO Verificar se não é um pedido de espera para a main (erro?)
 
-  // chama função que salva o contexto e bota o TCB pra bloqueado
-  // chama scheduler pra selecionar próxima thread.
-  return FUNC_NOT_IMPLEMENTED;
+    cjt = (cjoin_thread*) malloc(sizeof(cjoin_thread));
+    cjt->blockedTID = runningThread->tid;
+    cjt->blockingTID = tid;
+    //AppendFila2(&cjoinQueue, cjt);
+
+    // chama função que salva o contexto e bota o TCB pra bloqueado
+    // chama scheduler pra selecionar próxima thread.
+    return FUNC_NOT_IMPLEMENTED;
 }
 
 /******************************************************************************
@@ -184,8 +216,9 @@ Observações:
 
   * 1 para mutex. Outros valores pra questão de recursos.
 ******************************************************************************/
-int csem_init(csem_t *sem, int count) {
-  return FUNC_NOT_IMPLEMENTED;
+int csem_init(csem_t *sem, int count)
+{
+    return FUNC_NOT_IMPLEMENTED;
 }
 
 /******************************************************************************
@@ -199,14 +232,15 @@ Observações:
   * Solicitar um recurso.
 
   * Se count > 0, recurso livre, então decrementa count e deixa a thread executar.
-  
+
   * Se count <= 0, recurso ocupado, então decrementa count e bota a thread pra
     dormir (bota ela na lista do semáforo).
 
   * Sempre se decrementa o count.
 ******************************************************************************/
-int cwait(csem_t *sem) {
-  return FUNC_NOT_IMPLEMENTED;
+int cwait(csem_t *sem)
+{
+    return FUNC_NOT_IMPLEMENTED;
 }
 
 /******************************************************************************
@@ -230,8 +264,9 @@ Observações:
    aguardando pelo recurso. Se houver uma de média e uma de alta esperando,
     mesmo que a de média tenha chego antes, a de alta deve ganhar o recurso.
 ******************************************************************************/
-int csignal(csem_t *sem) {
-  return FUNC_NOT_IMPLEMENTED;
+int csignal(csem_t *sem)
+{
+    return FUNC_NOT_IMPLEMENTED;
 }
 
 /******************************************************************************
@@ -245,6 +280,7 @@ Retorno:
   Quando executada corretamente: retorna 0 (zero)
   Caso contrário, retorna um valor negativo.
 ******************************************************************************/
-int cidentify (char *name, int size) {
-  return FUNC_NOT_IMPLEMENTED;
+int cidentify (char *name, int size)
+{
+    return FUNC_NOT_IMPLEMENTED;
 }

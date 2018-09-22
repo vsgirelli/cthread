@@ -10,11 +10,11 @@
 // todos os .h estão sendo incluídos aqui, portanto, os demais .h e .c apenas
 // devem incluir cutils.h
 // pra não haver múltiplos includes
+#ifndef __cutils__
+#define __cutils__
 
-#include "../include/config.h"
-#include "../include/cthread.h"
-#include "../include/cdata.h"
-#include "../include/support.h"
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ucontext.h>
@@ -25,7 +25,7 @@ FILA2 readyQueuePrio0;
 FILA2 readyQueuePrio1;
 FILA2 readyQueuePrio2;
 
-// temos o problema da prioridade na hora de tirar de blocked pra apto 
+// temos o problema da prioridade na hora de tirar de blocked pra apto
 // vou consultar o carissimi sobre isso, mas não é problema por enquanto
 FILA2 blockedQueue;
 FILA2 suspendedReadyQueue;
@@ -36,15 +36,17 @@ FILA2 cjoinQueue;
 
 // TCB da thread que está no estado executando
 // verificar se essa tem que ser ponteiro ou não
-TCB_t *runningThread = NULL;
+TCB_t *runningThread;
 
 // verificar se essa tem que ser ponteiro ou não
-TCB_t *mainThread = NULL;
+TCB_t *mainThread;
+
+ucontext_t terminateContext;
 
 // contador pra atribuir o TID
 // thread main deve ser TID 0
 // todos 32 bits
-int numTID = 0;
+int numTID;
 
 // Pedro isso é contigo
 ucontext_t endExecSchedulerContext;
@@ -63,3 +65,8 @@ int checkMainThread(void);
 void setRunningThreadPrio(int prio);
 int getRunningThreadPrio(void);
 int searchThread(int tid);
+int createTID();
+void moveCreatedToList(* TCB_t);
+TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
+
+#endif

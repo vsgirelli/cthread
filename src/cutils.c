@@ -2,7 +2,9 @@
  *  Source com as funções utilizadas pela cthread para gerenciar o
  *  escalonamento das threads a nível de usuário.
  */
-
+#include "../include/support.h"
+#include "../include/cdata.h"
+#include "../include/config.h"
 #include "../include/cutils.h"
 
 // PEDRO THINGS (remove o que tu acha que é removível Pebronha)
@@ -20,32 +22,82 @@ bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos cria
 
 ******************************************************************************/
 
-int searchThread(int tid) {
-  // primeiro procura pela thread na lista de cjoinQueue
-  // se já ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING
-  // senão, procura nas demais listas
-  return FUNC_NOT_IMPLEMENTED;
+int searchThread(int tid)
+{
+    // primeiro procura pela thread na lista de cjoinQueue
+    // se já ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING
+    // senão, procura nas demais listas
+    return FUNC_NOT_IMPLEMENTED;
 }
 
 // verificar se a mainThread já existe
-int checkMainThread();
+int checkMainThread() {}
 
-void createThread();
+TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid)
+{
 
-// lembrar de incrementar
-void createTID();
 
+    TCB_t * newThread = (TCB_t*) malloc(sizeof(TCB_t)) ;
+
+    /**
+        Criacao do contexto
+    */
+    getcontext(&newThread->context);
+    newThread->context.uc_stack.ss_sp = (char *) malloc (SIGSTKSZ);
+    newThread->context.uc_stack.ss_size = SIGSTKSZ;
+    newThread->context.uc_link = &terminateContext;
+    makecontext(&(newThread->context), (void (*)(void)) start, 1, arg);
+
+    /**
+        Definicao dos atributos do TCB
+    */
+    newThread->tid = tid;
+    newThread->state = THREAD_STATE_READY;
+    newThread->prio = prio;
+    newThread->data = NULL;
+
+
+    return newThread;
+}
+
+int createTID()
+{
+    return numTID++;
+
+}
 // moveRunningToBlocked (ou Cjoin):
 // runningThread->context = getContext()
 // salva o contexto em Execução
 
-// AppendFila2(blockedQueue, runningThread) (ou 
+// AppendFila2(blockedQueue, runningThread) (ou
 // salva na fila de aptos a thread que vai ser preemptada
-void moveRunningToBlocked(); // ou cjoinQueue
+void moveRunningToBlocked() {
+ puts("?");
+       }// ou cjoinQueue
 
-int moveRunningToCjoin() {
-  AppendFila2(&cjoinQueue, runningThread);
-  return FUNC_NOT_IMPLEMENTED;
+int moveRunningToCjoin()
+{
+    //AppendFila2(&cjoinQueue, runningThread);
+    return FUNC_NOT_IMPLEMENTED;
+}
+
+
+int saveCurrentContext(){
+
+
+
+}
+
+/**
+    Dada uma thread recém criada,
+*/
+void moveCreatedToList(TCB_t* newThread){
+
+    if (){
+
+    }
+
+
 }
 
 // moveRunningToReady()
@@ -54,7 +106,12 @@ int moveRunningToCjoin() {
 
 // AppendFila2(readyQueuePrioX, runningThread)
 // salva na fila de aptos a thread que vai ser preemptada
-void moveRunningToReady();
+void moveRunningToReady()
+{
+ntContext();
+     }
+
+}
 
 // SCHEDULER:
 // seleciona a nova thread a ser executada (genérico pra qualquer troca de contexto)
@@ -62,17 +119,23 @@ void moveRunningToReady();
 // Se a fila 2 está vazia, então tenta pegar a primeira da fila 1.
 
 // a nova runningThread é a thread de mais alta prioridade
-// runningThread = first(readyQueuePrioX) 
+// runningThread = first(readyQueuePrioX)
 // de novo considerando prioridades
 
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
-void scheduler() ;
+       void scheduler()
+{
+     puts("?");
+}
 
 // cria main
 // inicializar as filas (support.h)
 // cria contexto pra chamada da terminateThread
-int initialCreate();
+int initialCreate()
+{
+     puts("?");
+}
 
 /*
  * todas as thread devem ser ligadas a essa função.
@@ -80,5 +143,8 @@ int initialCreate();
  * pra liberar recursos e o tcb, e posteriormente chamar o escalonador.
  * Tem que verificar se a thread terminada bloqueava alguém.
  */
-void terminateThread();
+void terminateThread()
+{
+     puts("?");
+}
 

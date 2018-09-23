@@ -6,9 +6,7 @@
 #include "../include/config.h"
 #include "../include/cutils.h"
 #include "../include/cthread.h"
-//#include "../include/cutils.h"
-// o ideal seria apenas adicionarmos a cthread.h, porém não podemos adicionar
-// lá a cutils.h
+
 
 /******************************************************************************
 Parâmetros:
@@ -48,32 +46,17 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
 
     newThread = createThread(start, arg, prio, tid);
 
+
     if (newThread->prio > runningThread->prio)
     {
+        moveRunningToReady();
+        moveCreatedToList(newThread);
         scheduler();
     } else {
-
-        moveToList(newThread);
+        moveCreatedToList(newThread);
 
     }
 
-
-    // http://pubs.opengroup.org/onlinepubs/009695299/functions/makecontext.html
-    // Prioridade dentro dos padrões, próximos passos:
-    // Verificar se a thread main foi criada, 2 casos possíveis:
-    //       1 - Se não existir, vamos ter que criar ela, pegar seu contexto e salvar num TCB,
-    //           podemos criar uma funcao createThread(u_context, func, arg)
-    //       2 - Caso exista prosseguimos para cria_novathread:
-
-    // novo tid
-    // criar contexto nova thread (linkar pra rotina de terminateThread)
-    // criar tcb nova thread
-    // linkar contexto ao TCB
-    // Verificar se prio > runningThread->prio
-    //     se sim, chama função que salva o contexto atual e bota o TCB pra o apto
-    //             chama scheduler pra selecionar próxima thread.
-    //     se não, adicionar para a fila certa de apto
-    // retorna ok
 
     return tid;
 }

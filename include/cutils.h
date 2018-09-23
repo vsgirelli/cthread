@@ -13,12 +13,12 @@
 #ifndef __cutils__
 #define __cutils__
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ucontext.h>
 #include <string.h>
+
+#define MAIN_THREAD_TID = 0
 
 // 3 listas pra TCBs de threads em estado apto, de acordo com prioridade
 FILA2 readyQueuePrio0;
@@ -66,7 +66,11 @@ void setRunningThreadPrio(int prio);
 int getRunningThreadPrio(void);
 int searchThread(int tid);
 int createTID();
-void moveCreatedToList(* TCB_t);
+int moveCreatedToList(TCB_t* newThread);
 TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
+
+int moveRunningToReady();
+int moveRunningToCjoin();
+int moveRunningToBlocked();
 
 #endif

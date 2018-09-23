@@ -7,6 +7,10 @@
 #include "../include/config.h"
 #include "../include/cutils.h"
 
+
+int numTID = 0;
+int mainThreadInitialized = 0;
+
 // PEDRO THINGS (remove o que tu acha que é removível Pebronha)
 /******************************************************************************
 Globais que acho que precisaremos:
@@ -31,7 +35,15 @@ int searchThread(int tid)
 }
 
 // verificar se a mainThread já existe
-int checkMainThread() {}
+int checkMainThread()
+{
+
+    if(mainThreadInitialized == 0)
+    {
+        return 1;
+    }
+    return 0;
+}
 
 TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid)
 {
@@ -56,13 +68,30 @@ TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid)
     newThread->prio = prio;
     newThread->data = NULL;
 
-
     return newThread;
+}
+
+PFILA2 getThreadReadyPrioQueue( TCB_t * thread)
+{
+
+    if (thread->prio == 0 )
+    {
+        return &readyQueuePrio0;
+    }
+    if (thread->prio == 1)
+    {
+        return &readyQueuePrio1;
+    }
+    if (thread->prio == 2)
+    {
+        return &readyQueuePrio2;
+    }
+
 }
 
 int createTID()
 {
-    return numTID++;
+    return ++numTID;
 
 }
 // moveRunningToBlocked (ou Cjoin):
@@ -71,9 +100,10 @@ int createTID()
 
 // AppendFila2(blockedQueue, runningThread) (ou
 // salva na fila de aptos a thread que vai ser preemptada
-void moveRunningToBlocked() {
- puts("?");
-       }// ou cjoinQueue
+int moveRunningToBlocked()
+{
+    return FUNC_WORKING;
+}// ou cjoinQueue
 
 int moveRunningToCjoin()
 {
@@ -82,21 +112,26 @@ int moveRunningToCjoin()
 }
 
 
-int saveCurrentContext(){
-
-
+void saveContext(TCB_t * tcb)
+{
 
 }
 
-/**
-    Dada uma thread recém criada,
-*/
-void moveCreatedToList(TCB_t* newThread){
 
-    if (){
+/**
+    Dada uma thread recém criada, move-a para a lista de acordo com sua prioridade
+*/
+int moveCreatedToList(TCB_t* newThread)
+{
+
+    PFILA2 filaCorrespondente = getThreadReadyPrioQueue(newThread);
+
+    if ( AppendFila2(filaCorrespondente, newThread) )
+    {
 
     }
 
+    return FUNC_WORKING;
 
 }
 
@@ -106,10 +141,17 @@ void moveCreatedToList(TCB_t* newThread){
 
 // AppendFila2(readyQueuePrioX, runningThread)
 // salva na fila de aptos a thread que vai ser preemptada
-void moveRunningToReady()
+int moveRunningToReady()
 {
-ntContext();
-     }
+    runningThread->state = PROCST_APTO;
+
+    PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(runningThread);
+
+    AppendFila2(FilaCorrespondente, runningThread);
+
+    runningThread = NULL;
+
+    return FUNC_WORKING;
 
 }
 
@@ -124,17 +166,11 @@ ntContext();
 
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
-       void scheduler()
+void scheduler()
 {
-     puts("?");
-}
-
-// cria main
-// inicializar as filas (support.h)
-// cria contexto pra chamada da terminateThread
-int initialCreate()
-{
-     puts("?");
+    FirstFila2(&readyQueuePrio1);
+    runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio1);
+    setcontext(&(runningThread->context));
 }
 
 /*
@@ -143,8 +179,60 @@ int initialCreate()
  * pra liberar recursos e o tcb, e posteriormente chamar o escalonador.
  * Tem que verificar se a thread terminada bloqueava alguém.
  */
-void terminateThread()
+void *terminateThread()
 {
-     puts("?");
+
+    puts("Entrou na funcao de terminar o contexto");
+
+
 }
+
+
+// cria main
+// inicializar as filas (support.h)
+// cria contexto pra chamada da terminateThread
+int initialCreate()
+{
+    /**
+        Criacao das filas
+    */
+    CreateFila2(&readyQueuePrio0);
+    CreateFila2(&readyQueuePrio1);
+    CreateFila2(&readyQueuePrio2);
+
+    CreateFila2(&blockedQueue);
+    CreateFila2(&suspendedReadyQueue);
+    CreateFila2(&suspendedBlockedQueue);
+
+    CreateFila2(&cjoinQueue);
+
+
+    /** Criacao da mainThread
+
+    */
+    mainThread = (TCB_t*) malloc(sizeof(TCB_t)) ;
+
+    //mainThread->tid = (int) MAIN_THREAD_TID;
+    mainThread->tid = 0;
+    mainThread->state = PROCST_APTO;
+    mainThread->prio = 0;
+    getcontext(&mainThread->context);
+    mainThread->data = NULL;
+
+    runningThread = mainThread;
+
+    /** Inicia o terminate context
+
+    */
+    getcontext(&terminateContext);
+    terminateContext.uc_stack.ss_sp = (char *) malloc (SIGSTKSZ);
+    terminateContext.uc_stack.ss_size = SIGSTKSZ;
+    terminateContext.uc_link = &(runningThread->context);
+    makecontext(&terminateContext, (void (*)(void)) terminateThread , 0);
+
+
+    return FUNC_NOT_IMPLEMENTED;
+
+}
+
 

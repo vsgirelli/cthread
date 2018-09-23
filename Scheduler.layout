@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="include/cdata.h" open="0" top="0" tabpos="0">
+		<Cursor position="900" topLine="0" />
+	</File>
+	<File name="include/config.h" open="0" top="0" tabpos="0">
+		<Cursor position="238" topLine="0" />
+	</File>
+	<File name="include/cthread.h" open="0" top="0" tabpos="0">
+		<Cursor position="262" topLine="0" />
+	</File>
+	<File name="include/cutils.h" open="0" top="0" tabpos="0">
+		<Cursor position="1263" topLine="20" />
+	</File>
+	<File name="include/support.h" open="0" top="0" tabpos="0">
+		<Cursor position="2861" topLine="58" />
+	</File>
+	<File name="src/cthread.c" open="1" top="1" tabpos="2">
+		<Cursor position="1625" topLine="25" />
+	</File>
+	<File name="src/cutils.c" open="1" top="0" tabpos="3">
+		<Cursor position="4247" topLine="63" />
+	</File>
+	<File name="src/main.c" open="1" top="0" tabpos="1">
+		<Cursor position="183" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

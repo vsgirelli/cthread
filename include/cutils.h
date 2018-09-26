@@ -11,8 +11,10 @@
 // devem incluir cutils.h
 // pra não haver múltiplos includes
 
+#ifndef _CUTILS_
+#define _CUTILS_
+
 #include "../include/config.h"
-#include "../include/cthread.h"
 #include "../include/cdata.h"
 #include "../include/support.h"
 #include <stdio.h>
@@ -57,9 +59,11 @@ typedef struct cjt {
 } cjoin_thread;
 
 // TODO atualizar a declaração de acordo com a última versão das funções.
-void scheduler(void);
+int scheduler(void);
 int initialCreate(void);
 int checkMainThread(void);
-void setRunningThreadPrio(int prio);
-int getRunningThreadPrio(void);
+int moveRunningToBlocked(void);
+void createThreads(void);
 int canBlock(int tid);
+
+#endif

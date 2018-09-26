@@ -3,6 +3,14 @@
  */
 
 #include "../include/cutils.h"
+#include "../include/config.h"
+#include "../include/cthread.h"
+#include "../include/cdata.h"
+#include "../include/support.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <ucontext.h>
+#include <string.h>
 // o ideal seria apenas adicionarmos a cthread.h, porém não podemos adicionar
 // lá a cutils.h
 
@@ -94,11 +102,11 @@ int csetprio(int tid, int prio) {
   }
   // POsso aumentar a prioridade da main?
 
-  setRunningThreadPrio(prio);
+  runningThread->prio = prio;
   // if the new priority is lower than the higher priority,
   // then check if there is any thread with higher priority,
   // if so, the current thread must suffer preemption.
-  if (getRunningThreadPrio() < PRIO_2) {
+  if (runningThread->prio < PRIO_2) {
     // usar as funções da support.h pra percorrer as listas
     // verifica na fila de prio 2
     //    se achou, chama função que salva o contexto e bota o TCB pra o apto
@@ -139,6 +147,8 @@ Observações:
 int cjoin(int tid) {
   cjoin_thread *cjt;
 
+  createThreads();
+
   if(mainThread == NULL) {
     if (initialCreate() != 0) {
       // TODO criar código pra erro de inicialização de fila
@@ -156,17 +166,23 @@ int cjoin(int tid) {
   else if (searchThread(tid) == THREAD_NOT_FOUND) {
     return THREAD_NOT_FOUND;
   }
-  
+
   // TODO Verificar se não é um pedido de espera para a main (erro?)
 
+  // se o tid existe e não bloqueia ninguém,
+  // cria a struct pra cjoin_thread
   cjt = (cjoin_thread*) malloc(sizeof(cjoin_thread));
   cjt->blockedTID = runningThread->tid;
   cjt->blockingTID = tid;
+  // adiciona essa struct à fila de threads bloqueadas por cjoin
   AppendFila2(&cjoinQueue, cjt);
 
-  // chama função que salva o contexto e bota o TCB pra bloqueado
+  // salvar o contexto e bota o TCB da runningThread pra bloqueado
+  moveRunningToBlocked();
   // chama scheduler pra selecionar próxima thread.
-  return FUNC_NOT_IMPLEMENTED;
+  scheduler();
+
+  return 0;
 }
 
 /******************************************************************************

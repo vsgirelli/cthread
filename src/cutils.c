@@ -10,6 +10,7 @@
 
 int numTID = 0;
 int mainThreadInitialized = 0;
+int yielding_tid = -1;
 
 // PEDRO THINGS (remove o que tu acha que é removível Pebronha)
 /******************************************************************************
@@ -25,6 +26,12 @@ valéria: isso seria associar a função de término né? e é ela quem chama o 
 bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos criar o contexto do escalonador e da main, usada para marcar isso!
 
 ******************************************************************************/
+void setYieldingTID(int tid){
+
+    yielding_tid = tid;
+
+}
+
 
 int searchThread(int tid)
 {
@@ -111,13 +118,6 @@ int moveRunningToCjoin()
     return FUNC_NOT_IMPLEMENTED;
 }
 
-
-void saveContext(TCB_t * tcb)
-{
-
-}
-
-
 /**
     Dada uma thread recém criada, move-a para a lista de acordo com sua prioridade
 */
@@ -135,12 +135,7 @@ int moveCreatedToList(TCB_t* newThread)
 
 }
 
-// moveRunningToReady()
-// runningThread->context = getContext()
-// salva o contexto em Execução
-
-// AppendFila2(readyQueuePrioX, runningThread)
-// salva na fila de aptos a thread que vai ser preemptada
+// Salva na fila de aptos a thread que vai ser preemptada
 int moveRunningToReady()
 {
     runningThread->state = PROCST_APTO;
@@ -155,22 +150,68 @@ int moveRunningToReady()
 
 }
 
-// SCHEDULER:
-// seleciona a nova thread a ser executada (genérico pra qualquer troca de contexto)
-// basicamente pega a primeira thread de mais alta prioridade.
-// Se a fila 2 está vazia, então tenta pegar a primeira da fila 1.
+// Troca o contexto para a thread sendo passada por parâmetro
+void changeContext (TCB_t * thread) {
 
-// a nova runningThread é a thread de mais alta prioridade
-// runningThread = first(readyQueuePrioX)
-// de novo considerando prioridades
+    setYieldingTID(-1);
+    runningThread = thread;
+    setcontext(&(runningThread->context));
+
+}
+
+
+
 
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
 void scheduler()
 {
-    FirstFila2(&readyQueuePrio1);
-    runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio1);
-    setcontext(&(runningThread->context));
+
+    // Caso a thread com prio2 nao tenha acabado de fazer um yield e haja thread com prio2
+    if (FirstFila2(&readyQueuePrio2) == 0 ){
+
+        setYieldingTID(-1);
+        runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio2);
+        setcontext(&(runningThread->context));
+        return;
+
+    }
+
+    if (FirstFila2(&readyQueuePrio1) == 0 ) {
+
+        setYieldingTID(-1);
+        runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio1);
+        setcontext(&(runningThread->context));
+        return;
+
+    }
+
+
+    else if (FirstFila2(&readyQueuePrio0) == 0 ){
+
+        setYieldingTID(-1);
+        runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio2);
+        setcontext(&(runningThread->context));
+        return;
+
+    }
+
+
+    //A unica thread rodando é a que fez o yield (main)
+    else if (yielding_tid > -1) {
+
+        setYieldingTID(-1);
+        scheduler();
+        return;
+
+    }
+
+    else {
+
+        return;
+
+    }
+
 }
 
 /*
@@ -184,10 +225,14 @@ void *terminateThread()
 
     puts("Entrou na funcao de terminar o contexto");
 
-
 }
 
 
+int isEmptyQueues(){
+
+    return FirstFila2(&readyQueuePrio0) && FirstFila2(&readyQueuePrio1) && FirstFila2(&readyQueuePrio2);
+
+}
 // cria main
 // inicializar as filas (support.h)
 // cria contexto pra chamada da terminateThread

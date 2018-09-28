@@ -22,6 +22,8 @@
 // thread de um dado tid não existe
 #define THREAD_NOT_FOUND -4
 #define THREAD_ALREADY_BLOCKING -5
+#define NO_THREAD_TO_SCHEDULE -6
+#define INSUFICIENT_SIZE -7
 
 // CÓDIGOS DE PRIORIDADE
 #define PRIO_0 0

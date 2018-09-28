@@ -76,10 +76,19 @@ Observações:
 ******************************************************************************/
 int cyield(void)
 {
-    // chama função que salva o contexto e bota o TCB pra o apto
-    // chama scheduler pra selecionar próxima thread.
 
-    return FUNC_NOT_IMPLEMENTED;
+    if (isEmptyQueues()){
+        // Nothing to do, continua o fluxo da thread
+        return FUNC_WORKING;
+    }
+
+    setYieldingTID(runningThread->tid);
+
+    moveRunningToReady();
+
+    scheduler();
+
+    return FUNC_WORKING;
 }
 
 /******************************************************************************
@@ -265,5 +274,13 @@ Retorno:
 ******************************************************************************/
 int cidentify (char *name, int size)
 {
-    return FUNC_NOT_IMPLEMENTED;
+    char* componentes = "Leandro Pereira - 00273114 \nPedro Trindade - 00264846\nValeria Girelli - 00261596";
+
+    if (strlen(componentes) > size) {
+        return INSUFICIENT_SIZE;
+    }
+
+    strcpy(name, componentes);
+
+    return FUNC_WORKING;
 }

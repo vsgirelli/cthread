@@ -41,6 +41,7 @@ TCB_t *runningThread;
 // verificar se essa tem que ser ponteiro ou não
 TCB_t *mainThread;
 
+// Contexto de execução ao término de uma thread
 ucontext_t terminateContext;
 
 // contador pra atribuir o TID
@@ -72,5 +73,6 @@ TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
 int moveRunningToReady();
 int moveRunningToCjoin();
 int moveRunningToBlocked();
-
+void setYieldingTID();
+int isEmptyQueues();
 #endif

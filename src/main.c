@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include "../include/support.h"
 #include "../include/cthread.h"
 
@@ -25,9 +24,9 @@ int main (void)
 
     //puts(name);
 
-    int id = ccreate(f3, NULL, 0);
+    int id = ccreate(f3, NULL, 2);
     puts("Main segue forte");
-    int id2 = ccreate(f2, NULL, 0);
+    int id2 = ccreate(f2, NULL, 2);
 
     int return_value = cyield();
 

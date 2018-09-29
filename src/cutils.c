@@ -78,7 +78,7 @@ TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid)
     return newThread;
 }
 
-PFILA2 getThreadReadyPrioQueue( TCB_t * thread)
+PFILA2 getThreadReadyPrioQueue(TCB_t * thread)
 {
 
     if (thread->prio == 0 )
@@ -109,6 +109,13 @@ int createTID()
 // salva na fila de aptos a thread que vai ser preemptada
 int moveRunningToBlocked()
 {
+    TCB_t* blockedThread = runningThread;
+
+    blockedThread->state = PROCST_BLOQ;
+
+    if(AppendFila2(&blockedQueue, (void*)blockedThread) != 0){
+        return -1;
+    }
     return FUNC_WORKING;
 }// ou cjoinQueue
 
@@ -147,7 +154,19 @@ int moveRunningToReady()
     runningThread = NULL;
 
     return FUNC_WORKING;
+}
 
+int moveBlockToReady(int tid){
+    // pega a thread bloqueada
+    TCB_t* thread = getThreadAndDelete(&blockedQueue, tid);
+
+    thread->state = PROCST_APTO;
+
+    PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(runningThread);
+
+    AppendFila2(FilaCorrespondente, runningThread);
+
+    return FUNC_WORKING;
 }
 
 // Troca o contexto para a thread sendo passada por parâmetro
@@ -158,9 +177,6 @@ void changeContext (TCB_t * thread) {
     setcontext(&(runningThread->context));
 
 }
-
-
-
 
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
@@ -280,4 +296,39 @@ int initialCreate()
 
 }
 
+// Retorna a thread a ser "acordada" e deleta a mesma da fila do semaforo
+// Caso não tenha thread para acordar, retorna NULL
+TCB_t *getThreadToWakeUpAndDelete(PFILA2 queue){
+	FILA2 *pf;
+	FirstFila2(queue);
+	pf = (FILA2*) GetAtIteratorFila2(queue);
+	while(pf != NULL){
+		TCB_t *pThread;
+		FirstFila2(pf);
+		pThread = (TCB_t*) GetAtIteratorFila2(pf);
+		if(pThread != NULL){
+			DeleteAtIteratorFila2(pf);
+			return pThread;
+		}
+		NextFila2(queue);
+		pf = (FILA2*) GetAtIteratorFila2(queue);
+	}
+	return NULL;
+}
 
+TCB_t *getThreadAndDelete(PFILA2 queue, int tid){
+	TCB_t *pThread;
+	FirstFila2(queue);
+	pThread = (TCB_t*) GetAtIteratorFila2(queue);
+	while(pThread != NULL){
+		if(pThread->tid == tid){
+			DeleteAtIteratorFila2(queue);
+			return pThread;
+		} else{
+			// otherwise, keep searching
+			NextFila2(queue);
+			pThread = (TCB_t*) GetAtIteratorFila2(queue);
+		}
+	}
+	return NULL;
+}

@@ -208,9 +208,32 @@ Observações:
 
   * 1 para mutex. Outros valores pra questão de recursos.
 ******************************************************************************/
-int csem_init(csem_t *sem, int count)
-{
-    return FUNC_NOT_IMPLEMENTED;
+int csem_init(csem_t *sem, int count){
+    if(checkMainThread() != 0 )
+        initialCreate();
+    // inicializar o semaforo
+    sem->count = count;
+    // fila será uma lista de filas, contendo uma fila
+    // para cada prioridade
+    if(CreateFila2(sem->fila) != 0)
+        return SEM_INIT_ERROR;
+
+    // cria as filas de prioridade
+    FILA2 filaprio0;
+	FILA2 filaprio1;
+	FILA2 filaprio2;
+	if(CreateFila2(&filaprio0) != 0)
+        return SEM_INIT_ERROR;
+	if(CreateFila2(&filaprio1) != 0)
+        return SEM_INIT_ERROR;
+	if(CreateFila2(&filaprio2) !=0 );
+        return SEM_INIT_ERROR;
+	// Adiciona as filas em ordem de prioridade
+	AppendFila2(sem->fila, (void*) &filaprio0);
+	AppendFila2(sem->fila, (void*) &filaprio1);
+	AppendFila2(sem->fila, (void*) &filaprio2);
+
+    return 0;
 }
 
 /******************************************************************************
@@ -230,9 +253,38 @@ Observações:
 
   * Sempre se decrementa o count.
 ******************************************************************************/
-int cwait(csem_t *sem)
-{
-    return FUNC_NOT_IMPLEMENTED;
+int cwait(csem_t *sem){
+    if(checkMainThread() != 0 )
+        initialCreate();
+    if(sem == NULL){
+        return NOT_INITIALIZED_SEM;
+    }
+    sem->count = sem->count - 1;
+    // colocar a thread para bloqueado
+    if(sem->count < 0){
+        TCB_t* blockedThread = runningThread;
+        if((moveRunningToBlocked) != 0){
+            return -1;
+        }
+        // como sem->fila eh uma fila de filas de prioridade
+        // eh necessario pegar a fila correta para ser inserido a thread
+        int prio = blockedThread->prio;
+        FILA2 *pf;
+        FirstFila2(sem->fila);
+        pf = (FILA2*) GetAtIteratorFila2(sem->fila);
+        int i;
+        for(i=0; i<prio; i++){
+		    NextFila2(sem->fila);
+            pf = (FILA2*) GetAtIteratorFila2(sem->fila);
+        }
+        // apos encontrar a fila correta, insere
+        if(AppendFila2(pf, (void*)blockedThread) != 0){
+            return -1;
+        }
+        // escalonador ira colocar alguem para ser executado
+        scheduler();
+    }
+    return 0;
 }
 
 /******************************************************************************
@@ -256,9 +308,33 @@ Observações:
    aguardando pelo recurso. Se houver uma de média e uma de alta esperando,
     mesmo que a de média tenha chego antes, a de alta deve ganhar o recurso.
 ******************************************************************************/
-int csignal(csem_t *sem)
-{
-    return FUNC_NOT_IMPLEMENTED;
+int csignal(csem_t *sem){
+    if(checkMainThread() != 0 )
+        initialCreate();
+    if(sem == NULL){
+        return NOT_INITIALIZED_SEM;
+    }
+
+    sem->count = sem->count + 1;
+    // Se fila não está vazia
+    if(FirstFila2(sem->fila) == 0){
+    // Pega o primeiro para acordar e remove da fila
+        TCB_t* wakeThread = (TCB_t*) getThreadToWakeUpAndDelete(sem->fila);
+        // Remove da fila de bloqueado e colocar para apto
+        if(wakeThread->state == PROCST_BLOQ){
+            if(moveBlockToReady(&wakeThread->tid) < 0){
+                return -1;
+            }
+            // como a movimentacao para a fila de apto
+            // eh necessario chamar o escalonador
+            if(runningThread->prio > wakeThread->prio)
+                scheduler();
+        }
+        else{
+            return THREAD_NOT_BLOCKED;
+        }
+    }
+    return FUNC_WORKING;
 }
 
 /******************************************************************************

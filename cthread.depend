@@ -1,0 +1,65 @@
+# depslib dependency file v1.0
+1538263908 source:/home/aluno/Desktop/diretorio/pedro/src/cthread.c
+	"../include/support.h"
+	"../include/cdata.h"
+	"../include/config.h"
+	"../include/cutils.h"
+	"../include/cthread.h"
+
+1538186412 /home/aluno/Desktop/diretorio/pedro/include/support.h
+
+1538194063 /home/aluno/Desktop/diretorio/pedro/include/cdata.h
+	"ucontext.h"
+
+1538193785 /home/aluno/Desktop/diretorio/pedro/include/config.h
+
+1538195226 /home/aluno/Desktop/diretorio/pedro/include/cutils.h
+	<stdio.h>
+	<stdlib.h>
+	<ucontext.h>
+	<string.h>
+
+1538185779 /home/aluno/Desktop/diretorio/pedro/include/cthread.h
+	"support.h"
+
+1538263836 source:/home/aluno/Desktop/diretorio/pedro/src/cutils.c
+	"../include/support.h"
+	"../include/cdata.h"
+	"../include/config.h"
+	"../include/cutils.h"
+
+1538185779 source:/home/aluno/Desktop/diretorio/pedro/src/lib.c
+	<stdio.h>
+	<string.h>
+	"../include/support.h"
+	"../include/cthread.h"
+	"../include/cdata.h"
+
+1538185779 source:/home/aluno/Desktop/diretorio/pedro/exemplos/exemplo.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+
+1538185779 source:/home/aluno/Desktop/diretorio/pedro/exemplos/mandel.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+
+1538185779 source:/home/aluno/Desktop/diretorio/pedro/exemplos/series.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+
+1538185779 source:/home/aluno/Desktop/diretorio/pedro/exemplos/teste_vetor.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+	<stdlib.h>
+
+1538191255 source:/home/aluno/Desktop/diretorio/pedro/src/main.c
+	<stdio.h>
+	"../include/support.h"
+	"../include/cthread.h"
+

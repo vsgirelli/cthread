@@ -49,8 +49,17 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
 
     if (newThread->prio < runningThread->prio)
     {
+        TCB_t * preemptedThread = runningThread;
+
         moveRunningToReady();
-        moveCreatedToList(newThread);
+
+        runningThread = newThread;
+
+        if ( swapcontext(&(preemptedThread->context), &(runningThread->context)) == -1 ) {
+
+            return FUNC_NOT_WORKING;
+
+        }
 
     } else {
         moveCreatedToList(newThread);
@@ -87,7 +96,11 @@ int cyield(void)
 
     moveRunningToReady();
 
-    swapcontext(&yieldingThread->context, &schedulerContext);
+    if ( swapcontext(&yieldingThread->context, &schedulerContext) == -1){
+
+        return FUNC_NOT_WORKING;
+
+    }
 
     return FUNC_WORKING;
 }

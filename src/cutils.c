@@ -128,7 +128,7 @@ int moveCreatedToList(TCB_t* newThread)
 
     if ( AppendFila2(filaCorrespondente, newThread) )
     {
-
+        return FUNC_NOT_WORKING;
     }
 
     return FUNC_WORKING;
@@ -142,7 +142,11 @@ int moveRunningToReady()
 
     PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(runningThread);
 
-    AppendFila2(FilaCorrespondente, runningThread);
+    if ( AppendFila2(FilaCorrespondente, runningThread) ){
+
+        return FUNC_NOT_WORKING;
+
+    }
 
     runningThread = NULL;
 

@@ -4,7 +4,6 @@
 #include "../include/cthread.h"
 
 void *f3(){
-    int d = cyield();
     puts("Thread3 imprimindo");
 }
 
@@ -14,7 +13,7 @@ void *f2(){
 }
 
 void *f1(){
-    puts("Thread3 imprimindo");
+    puts("Thread1 imprimindo");
 
 }
 
@@ -28,6 +27,8 @@ int main (void)
 
     int id = ccreate(f3, NULL, 2);
     int id2 = ccreate(f2, NULL, 2);
+    int id3 = ccreate(f1, NULL, 1);
+    puts("Yeah boooy");
     int d = cyield();
     int f = cyield();
     puts("nao preempta");

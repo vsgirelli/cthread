@@ -44,6 +44,10 @@ TCB_t *mainThread;
 // Contexto de execução ao término de uma thread
 ucontext_t terminateContext;
 
+// Contexto do scheduler
+ucontext_t schedulerContext;
+
+
 // contador pra atribuir o TID
 // thread main deve ser TID 0
 // todos 32 bits
@@ -60,7 +64,7 @@ typedef struct cjt {
 } cjoin_thread;
 
 // TODO atualizar a declaração de acordo com a última versão das funções.
-void scheduler(void);
+void *scheduler(void);
 int initialCreate(void);
 int checkMainThread(void);
 void setRunningThreadPrio(int prio);
@@ -73,6 +77,5 @@ TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
 int moveRunningToReady();
 int moveRunningToCjoin();
 int moveRunningToBlocked();
-void setYieldingTID();
 int isEmptyQueues();
 #endif

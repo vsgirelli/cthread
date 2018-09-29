@@ -47,11 +47,11 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
     newThread = createThread(start, arg, prio, tid);
 
 
-    if (newThread->prio > runningThread->prio)
+    if (newThread->prio < runningThread->prio)
     {
         moveRunningToReady();
         moveCreatedToList(newThread);
-        scheduler();
+
     } else {
         moveCreatedToList(newThread);
 
@@ -76,17 +76,18 @@ Observações:
 ******************************************************************************/
 int cyield(void)
 {
+    TCB_t* yieldingThread;
 
     if (isEmptyQueues()){
         // Nothing to do, continua o fluxo da thread
         return FUNC_WORKING;
     }
 
-    setYieldingTID(runningThread->tid);
+    yieldingThread = runningThread;
 
     moveRunningToReady();
 
-    scheduler();
+    swapcontext(&yieldingThread->context, &schedulerContext);
 
     return FUNC_WORKING;
 }

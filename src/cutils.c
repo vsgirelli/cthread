@@ -150,65 +150,32 @@ int moveRunningToReady()
 
 }
 
-// Troca o contexto para a thread sendo passada por parâmetro
-void changeContext (TCB_t * thread) {
-
-    setYieldingTID(-1);
-    runningThread = thread;
-    setcontext(&(runningThread->context));
-
-}
-
-
-
-
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
-void scheduler()
+void *scheduler()
 {
 
     // Caso a thread com prio2 nao tenha acabado de fazer um yield e haja thread com prio2
-    if (FirstFila2(&readyQueuePrio2) == 0 ){
+    if (FirstFila2(&readyQueuePrio0) == 0 ){
 
-        setYieldingTID(-1);
-        runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio2);
+        runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio0);
         setcontext(&(runningThread->context));
-        return;
 
     }
 
-    if (FirstFila2(&readyQueuePrio1) == 0 ) {
+    else if (FirstFila2(&readyQueuePrio1) == 0 ) {
 
-        setYieldingTID(-1);
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio1);
         setcontext(&(runningThread->context));
-        return;
 
     }
 
 
-    else if (FirstFila2(&readyQueuePrio0) == 0 ){
+    else if (FirstFila2(&readyQueuePrio2) == 0 ){
 
-        setYieldingTID(-1);
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio2);
+        DeleteAtIteratorFila2(&readyQueuePrio2);
         setcontext(&(runningThread->context));
-        return;
-
-    }
-
-
-    //A unica thread rodando é a que fez o yield (main)
-    else if (yielding_tid > -1) {
-
-        setYieldingTID(-1);
-        scheduler();
-        return;
-
-    }
-
-    else {
-
-        return;
 
     }
 
@@ -223,8 +190,14 @@ void scheduler()
 void *terminateThread()
 {
 
-    puts("Entrou na funcao de terminar o contexto");
+    free(runningThread->context.uc_stack.ss_sp);
+    free(runningThread);
 
+    runningThread = NULL;
+
+    scheduler();
+
+    return;
 }
 
 
@@ -238,6 +211,9 @@ int isEmptyQueues(){
 // cria contexto pra chamada da terminateThread
 int initialCreate()
 {
+
+    mainThreadInitialized = 1;
+
     /**
         Criacao das filas
     */
@@ -260,7 +236,7 @@ int initialCreate()
     //mainThread->tid = (int) MAIN_THREAD_TID;
     mainThread->tid = 0;
     mainThread->state = PROCST_APTO;
-    mainThread->prio = 0;
+    mainThread->prio = 2;
     getcontext(&mainThread->context);
     mainThread->data = NULL;
 
@@ -272,9 +248,17 @@ int initialCreate()
     getcontext(&terminateContext);
     terminateContext.uc_stack.ss_sp = (char *) malloc (SIGSTKSZ);
     terminateContext.uc_stack.ss_size = SIGSTKSZ;
-    terminateContext.uc_link = &(runningThread->context);
+    terminateContext.uc_link = 0;
     makecontext(&terminateContext, (void (*)(void)) terminateThread , 0);
 
+    /** Inicia o scheduler context
+
+    */
+    getcontext(&schedulerContext);
+    schedulerContext.uc_stack.ss_sp = (char *) malloc (SIGSTKSZ);
+    schedulerContext.uc_stack.ss_size = SIGSTKSZ;
+    schedulerContext.uc_link = 0;
+    makecontext(&schedulerContext, (void (*)(void)) scheduler , 0);
 
     return FUNC_NOT_IMPLEMENTED;
 

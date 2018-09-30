@@ -33,16 +33,16 @@ void setYieldingTID(int tid)
 
 }
 
-// procurar thread em uma determinada lista
+// procurar thread
 // se encontrou retorna a thread
 // caso contrario, retorna THREAD_NOT_FOUND
-TCB_t * searchThread(PFILA2 queue, int tid)
+TCB_t * searchThread(int tid)
 {
 
 
     TCB_t *pThread;
-    FirstFila2(queue);
-    pThread = (TCB_t*) GetAtIteratorFila2(queue);
+    FirstFila2(&readyQueuePrio0);
+    pThread = (TCB_t*) GetAtIteratorFila2(&readyQueuePrio0);
     while(pThread != NULL)
     {
         if(pThread->tid == tid)
@@ -53,8 +53,8 @@ TCB_t * searchThread(PFILA2 queue, int tid)
         else
         {
             // otherwise, keep searching
-            NextFila2(queue);
-            pThread = (TCB_t*) GetAtIteratorFila2(queue);
+            NextFila2(&readyQueuePrio0);
+            pThread = (TCB_t*) GetAtIteratorFila2(&readyQueuePrio0);
         }
     }
     return THREAD_NOT_FOUND;

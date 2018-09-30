@@ -69,7 +69,7 @@ int initialCreate(void);
 int checkMainThread(void);
 void setRunningThreadPrio(int prio);
 int getRunningThreadPrio(void);
-int searchThread(int tid);
+TCB_t * searchThread(int tid);
 int createTID();
 int moveCreatedToList(TCB_t* newThread);
 TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);

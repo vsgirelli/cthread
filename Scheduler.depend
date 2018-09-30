@@ -38,7 +38,7 @@
 	"../include/cutils.h"
 	"../include/cthread.h"
 
-1538345343 /home/aluno/sisop-scheduler/include/cutils.h
+1538346658 /home/aluno/sisop-scheduler/include/cutils.h
 	<stdio.h>
 	<stdlib.h>
 	<ucontext.h>

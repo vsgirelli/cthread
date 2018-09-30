@@ -179,7 +179,7 @@ int cjoin(int tid)
 {
     cjoin_thread *cjt;
 
-    if(mainThread == NULL)
+    if(checkMainThread() != 0)
     {
         if (initialCreate() != 0)
         {

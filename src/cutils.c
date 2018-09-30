@@ -184,11 +184,6 @@ int moveRunningToReady()
 
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
-<<<<<<< HEAD
-int scheduler() {
-  return FUNC_NOT_IMPLEMENTED;
-}
-
 void *scheduler()
 {
 
@@ -350,4 +345,3 @@ TCB_t *getThreadAndDelete(PFILA2 queue, int tid)
     }
     return NULL;
 }
->>>>>>> 8227e96363e5d4ffe16666ad8a06aec27bc086c5

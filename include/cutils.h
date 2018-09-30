@@ -10,24 +10,22 @@
 // todos os .h estão sendo incluídos aqui, portanto, os demais .h e .c apenas
 // devem incluir cutils.h
 // pra não haver múltiplos includes
+#ifndef __cutils__
+#define __cutils__
 
-#ifndef _CUTILS_
-#define _CUTILS_
-
-#include "../include/config.h"
-#include "../include/cdata.h"
-#include "../include/support.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ucontext.h>
 #include <string.h>
+
+#define MAIN_THREAD_TID = 0
 
 // 3 listas pra TCBs de threads em estado apto, de acordo com prioridade
 FILA2 readyQueuePrio0;
 FILA2 readyQueuePrio1;
 FILA2 readyQueuePrio2;
 
-// temos o problema da prioridade na hora de tirar de blocked pra apto 
+// temos o problema da prioridade na hora de tirar de blocked pra apto
 // vou consultar o carissimi sobre isso, mas não é problema por enquanto
 FILA2 blockedQueue;
 FILA2 suspendedReadyQueue;
@@ -38,15 +36,22 @@ FILA2 cjoinQueue;
 
 // TCB da thread que está no estado executando
 // verificar se essa tem que ser ponteiro ou não
-TCB_t *runningThread = NULL;
+TCB_t *runningThread;
 
 // verificar se essa tem que ser ponteiro ou não
-TCB_t *mainThread = NULL;
+TCB_t *mainThread;
+
+// Contexto de execução ao término de uma thread
+ucontext_t terminateContext;
+
+// Contexto do scheduler
+ucontext_t schedulerContext;
+
 
 // contador pra atribuir o TID
 // thread main deve ser TID 0
 // todos 32 bits
-int numTID = 0;
+int numTID;
 
 // Pedro isso é contigo
 ucontext_t endExecSchedulerContext;
@@ -59,12 +64,20 @@ typedef struct cjt {
 } cjoin_thread;
 
 // TODO atualizar a declaração de acordo com a última versão das funções.
-int scheduler(void);
+void *scheduler(void);
 int initialCreate(void);
 int checkMainThread(void);
 int searchThread(int tid);
-int moveRunningToBlocked(void);
-void createThreads(void);
+int createTID();
+int moveCreatedToList(TCB_t* newThread);
+TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
 
+int moveRunningToReady();
+int moveRunningToCjoin();
+int moveRunningToBlocked();
+int moveBlockToReady();
+int isEmptyQueues();
+TCB_t *getThreadToWakeUpAndDelete(PFILA2 queue);
+TCB_t *getThreadAndDelete(PFILA2 queue, int tid);
 
 #endif

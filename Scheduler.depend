@@ -1,0 +1,69 @@
+# depslib dependency file v1.0
+1537640925 source:/home/aluno/sisop-scheduler/exemplos/exemplo.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+
+1537640925 /home/aluno/sisop-scheduler/include/support.h
+
+1537649626 /home/aluno/sisop-scheduler/include/cthread.h
+	"support.h"
+
+1537640925 source:/home/aluno/sisop-scheduler/exemplos/mandel.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+
+1537640925 source:/home/aluno/sisop-scheduler/exemplos/series.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+
+1537640925 source:/home/aluno/sisop-scheduler/exemplos/teste_vetor.c
+	"../include/support.h"
+	"../include/cthread.h"
+	<stdio.h>
+	<stdlib.h>
+
+1537640925 source:/home/aluno/sisop-scheduler/main.c
+	<stdio.h>
+	<ucontext.h>
+
+1538268893 source:/home/aluno/sisop-scheduler/src/cthread.c
+	"../include/support.h"
+	"../include/cdata.h"
+	"../include/config.h"
+	"../include/cutils.h"
+	"../include/cthread.h"
+
+1538265020 /home/aluno/sisop-scheduler/include/cutils.h
+	<stdio.h>
+	<stdlib.h>
+	<ucontext.h>
+	<string.h>
+
+1538264972 /home/aluno/sisop-scheduler/include/config.h
+
+1537640925 /home/aluno/sisop-scheduler/include/cdata.h
+	"ucontext.h"
+
+1537640925 source:/home/aluno/sisop-scheduler/src/lib.c
+	<stdio.h>
+	<string.h>
+	"../include/support.h"
+	"../include/cthread.h"
+	"../include/cdata.h"
+
+1538266382 source:/home/aluno/sisop-scheduler/src/main.c
+	<stdio.h>
+	"../include/support.h"
+	"../include/cthread.h"
+
+1538267932 source:/home/aluno/sisop-scheduler/src/cutils.c
+	"../include/support.h"
+	"../include/cdata.h"
+	"../include/config.h"
+	"../include/cutils.h"
+

@@ -33,13 +33,33 @@ void setYieldingTID(int tid)
 
 }
 
-
-int searchThread(int tid)
+// procurar thread em uma determinada lista
+// se encontrou retorna a thread
+// caso contrario, retorna THREAD_NOT_FOUND
+TCB_t * searchThread(PFILA2 queue, int tid)
 {
-    // primeiro procura pela thread na lista de cjoinQueue
-    // se já ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING
-    // senão, procura nas demais listas
-    return FUNC_NOT_IMPLEMENTED;
+
+
+    TCB_t *pThread;
+    FirstFila2(queue);
+    pThread = (TCB_t*) GetAtIteratorFila2(queue);
+    while(pThread != NULL)
+    {
+        if(pThread->tid == tid)
+        {
+            // found thread and return
+            return 0;
+        }
+        else
+        {
+            // otherwise, keep searching
+            NextFila2(queue);
+            pThread = (TCB_t*) GetAtIteratorFila2(queue);
+        }
+    }
+    return THREAD_NOT_FOUND;
+
+
 }
 
 // verificar se a mainThread já existe
@@ -125,9 +145,9 @@ int moveBlockToReady(int tid)
 
     thread->state = PROCST_APTO;
 
-    PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(runningThread);
+    PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(thread);
 
-    AppendFila2(FilaCorrespondente, runningThread);
+    AppendFila2(FilaCorrespondente, thread);
 
     return FUNC_WORKING;
 }
@@ -176,6 +196,35 @@ int moveRunningToReady()
 
 }
 
+/**
+    Retorna 0 quando existe uma fila com a prioridade maior que contenha threads em apto.
+*/
+int existsHigherPrioThread(int prio)
+{
+
+    if (prio == 0)
+    {
+
+        return -1;
+
+    }
+
+    else
+    {
+
+        if (prio == 1)
+        {
+            return  FirstFila2(&readyQueuePrio0) ;
+        }
+
+        if (prio == 2)
+        {
+            return  ( FirstFila2(&readyQueuePrio0) && FirstFila2(&readyQueuePrio1) );
+        }
+
+    }
+
+}
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
 void *scheduler()
@@ -186,6 +235,7 @@ void *scheduler()
     {
 
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio0);
+        DeleteAtIteratorFila2(&readyQueuePrio1);
         setcontext(&(runningThread->context));
 
     }
@@ -194,6 +244,7 @@ void *scheduler()
     {
 
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio1);
+        DeleteAtIteratorFila2(&readyQueuePrio1);
         setcontext(&(runningThread->context));
 
     }
@@ -292,30 +343,6 @@ int initialCreate()
 
     return FUNC_NOT_IMPLEMENTED;
 
-}
-
-
-// Retorna a thread a ser "acordada" e deleta a mesma da fila do semaforo
-// Caso não tenha thread para acordar, retorna NULL
-TCB_t *getThreadToWakeUpAndDelete(PFILA2 queue)
-{
-    FILA2 *pf;
-    FirstFila2(queue);
-    pf = (FILA2*) GetAtIteratorFila2(queue);
-    while(pf != NULL)
-    {
-        TCB_t *pThread;
-        FirstFila2(pf);
-        pThread = (TCB_t*) GetAtIteratorFila2(pf);
-        if(pThread != NULL)
-        {
-            DeleteAtIteratorFila2(pf);
-            return pThread;
-        }
-        NextFila2(queue);
-        pf = (FILA2*) GetAtIteratorFila2(queue);
-    }
-    return NULL;
 }
 
 TCB_t *getThreadAndDelete(PFILA2 queue, int tid)

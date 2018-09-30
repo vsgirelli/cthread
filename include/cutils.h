@@ -67,7 +67,6 @@ typedef struct cjt {
 void *scheduler(void);
 int initialCreate(void);
 int checkMainThread(void);
-int searchThread(int tid);
 int createTID();
 int moveCreatedToList(TCB_t* newThread);
 TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
@@ -79,5 +78,8 @@ int moveBlockToReady();
 int isEmptyQueues();
 TCB_t *getThreadToWakeUpAndDelete(PFILA2 queue);
 TCB_t *getThreadAndDelete(PFILA2 queue, int tid);
+int moveRunningToBlocked(void);
+void createThreads(void);
+int canBlock(int tid);
 
 #endif

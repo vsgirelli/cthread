@@ -41,12 +41,64 @@ void setYieldingTID(int tid)
 }
 
 
-int searchThread(int tid)
-{
+// procurar thread em uma determinada lista
+// se encontrou retorna 0
+// caso contrario, retorna THREAD_NOT_FOUND
+int searchThread(PFILA2 queue, int tid){
+	TCB_t *pThread;
+	FirstFila2(queue);			
+	pThread = (TCB_t*) GetAtIteratorFila2(queue);
+	while(pThread != NULL){
+		if(pThread->tid == tid){
+			// found thread and return
+			return 0;
+		} else{
+			// otherwise, keep searching
+			NextFila2(queue);
+			pThread = (TCB_t*) GetAtIteratorFila2(queue);
+		}
+	}
+	return THREAD_NOT_FOUND;		
+}
+
+// verifica se a thread ja esta bloqueando alguem
+// se nao bloqueia ninguem retorna 0 
+// caso contrario, THREAD_ALREADY_BLOCKING
+int checkThreadBlocking(PFILA2 queue, int tid){
+	cjoin_thread *pCjoin_thread;
+	FirstFila2(queue);
+	pCjoin_thread = (cjoin_thread*) GetAtIteratorFila2(queue);
+	while(pCjoin_thread != NULL){
+		if(pCjoin_thread->blockingTID == tid){			
+			return THREAD_ALREADY_BLOCKING;
+		} else{	
+			NextFila2(queue);
+			pCjoin_thread = (cjoin_thread*) GetAtIteratorFila2(queue);
+		}	
+	}
+	return 0;
+}
+
+// verifica se eh possivel bloquear a thread referenciada por esse tid
+// 0 se eh possivel
+// caso contrario, erro:
+//  THREAD_ALREADY_BLOCKING
+//  THREAD_NOT_FOUND
+int canBlock(int tid) {
     // primeiro procura pela thread na lista de cjoinQueue
-    // se jÃ¡ ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING
+    // se jÃ¡ ta em cjoinQueue, retrna THREAD_ALREADY_BLOCKING    
+    if(checkThreadBlocking(&cjoinQueue, tid) != 0)
+        return THREAD_ALREADY_BLOCKING;
     // senÃ£o, procura nas demais listas
-    return FUNC_NOT_IMPLEMENTED;
+    if(searchThread(&readyQueuePrio0, tid) == 0)
+        return 0;
+    if(searchThread(&readyQueuePrio1, tid) == 0)
+        return 0;
+    if(searchThread(&readyQueuePrio2, tid) == 0)
+        return 0;
+    if(searchThread(&blockedQueue, tid) == 0)
+        return 0;
+    return THREAD_NOT_FOUND;
 }
 
 // verificar se a mainThread jÃ¡ existe
@@ -131,9 +183,9 @@ int moveBlockToReady(int tid)
 
     thread->state = PROCST_APTO;
 
-    PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(runningThread);
+    PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(thread);
 
-    AppendFila2(FilaCorrespondente, runningThread);
+    AppendFila2(FilaCorrespondente, thread);
 
     return FUNC_WORKING;
 }
@@ -192,6 +244,7 @@ void *scheduler()
     {
 
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio0);
+        DeleteAtIteratorFila2(&readyQueuePrio0);
         setcontext(&(runningThread->context));
 
     }
@@ -200,6 +253,7 @@ void *scheduler()
     {
 
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio1);
+        DeleteAtIteratorFila2(&readyQueuePrio1);
         setcontext(&(runningThread->context));
 
     }
@@ -213,7 +267,33 @@ void *scheduler()
         setcontext(&(runningThread->context));
 
     }
+printf("runningThread->tid: %d\n", runningThread->tid);
+}
 
+/*
+ *  Verifica se a thread que terminou está bloqueando alguma thread.
+ *  Caso esteja, liberar a thread bloqueada.
+ */
+void checkIfBlocking() {
+  cjoin_thread *cjt; 
+  FirstFila2(&cjoinQueue);
+  cjt = (cjoin_thread*) GetAtIteratorFila2(&cjoinQueue);
+
+  while (cjt != NULL) {
+    // se o algum blockingTID for igual ao tid da thead em execução
+    if (cjt->blockingTID == runningThread->tid) {
+      // então procurar em blockedQueue pela thread de tid blockedTID
+      // e mover esta para a fila de apto correspondente
+      moveBlockToReady(cjt->blockedTID);
+      printf("blockedTID: %d\n", cjt->blockedTID);
+
+      return;
+    }
+    else {  
+      NextFila2(&cjoinQueue);
+      cjt = (cjoin_thread*) GetAtIteratorFila2(&cjoinQueue);
+    }
+  }
 }
 
 /*
@@ -224,6 +304,7 @@ void *scheduler()
  */
 void *terminateThread()
 {
+    checkIfBlocking();
 
     free(runningThread->context.uc_stack.ss_sp);
     free(runningThread);

@@ -29,6 +29,8 @@ Observações:
 
 ******************************************************************************/
 
+int olarc = 0;
+
 int ccreate (void* (*start)(void*), void *arg, int prio)
 {
 
@@ -44,6 +46,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
     }
 
     tid = createTID();
+    //printf("olar %d\n", olarc++);
 
     newThread = createThread(start, arg, prio, tid);
 
@@ -175,10 +178,12 @@ Observações:
 
     (Anotações sobre a cjoin no dúvidas e no labbook)
 ******************************************************************************/
+int olarjoin = 0;
 int cjoin(int tid)
 {
     cjoin_thread *cjt;
 
+  //printf("olar cjoin %d\n", olarjoin++);
     if(checkMainThread() != 0)
     {
         if (initialCreate() != 0)
@@ -190,15 +195,15 @@ int cjoin(int tid)
         return THREAD_NOT_FOUND;
     }
 
-  // Verificar se a thread já bloqueia alguém
-  // e depois verifica a existência do tid pelo qual se quer bloquear
-  if(searchThread(tid) == THREAD_ALREADY_BLOCKING) {
-    return THREAD_ALREADY_BLOCKING;
-  }
-  else if (searchThread(tid) == THREAD_NOT_FOUND) {
-    return THREAD_NOT_FOUND;
+  // verificar se � poss�vel bloquear essa thread:
+  // primeiro verifica se a thread pela qual se quer bloquear j� bloqueia algu�m
+  // depois verifica se essa thread existe.
+  int err = canBlock(tid);
+  if(err != 0) {
+    return err;
   }
 
+  //printf("olar cjoin %d\n", olarjoin++);
   // TODO Verificar se não é um pedido de espera para a main (erro?)
 
   // se o tid existe e não bloqueia ninguém,
@@ -211,6 +216,11 @@ int cjoin(int tid)
 
   // salvar o contexto e bota o TCB da runningThread pra bloqueado
   moveRunningToBlocked();
+
+  //FirstFila2(&blockedQueue);
+  //TCB_t *thread = GetAtIteratorFila2(&blockedQueue);
+  //printf("id da thread bloqueda: %d\n", thread->tid);
+
   // chama scheduler pra selecionar próxima thread.
   scheduler();
 

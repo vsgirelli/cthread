@@ -4,20 +4,29 @@
 #include "../include/cthread.h"
 csem_t semaphore1;
 
-void *f3(){
-    puts("Thread3 imprimindo");
+int tid2;
+
+void *f1(){
+    puts("Thread1 before cjoin");
+    //cjoin(tid2);
+    puts("Thread1 after cjoin");
 }
 
 void *f2(){
-    puts("Thread2 before cwait");
-    int cid = cwait(&semaphore1);
-    puts("Thread2 after wait");
+  puts("Thread2 imprimindo antes de cyield");
+  //int tid1 = ccreate(f1, NULL, 1);
+  //cyield();
+  puts("Thread2 imprimindo depois de cyield");
 }
 
-void *f1(){
-    puts("Thread1 imprimindo");
-    csignal(&semaphore1);
+void *f3(){
+    puts("Thread3 imprimindo");
+    tid2 = ccreate(f2, NULL, 1);
+    puts("td3 depois de criar td2");
+    cjoin(tid2);
+    puts("td3 depois de join td2");
 }
+
 
 int main (void)
 {
@@ -25,14 +34,14 @@ int main (void)
     char name[size];
     cidentify(name, size);
     //puts(name);
-    int sid = csem_init(&semaphore1, 0);
+    //int sid = csem_init(&semaphore1, 0);
 
-    //int tid = ccreate(f3, NULL, 2);
-    int tid2 = ccreate(f2, NULL, 2);
-    int tid3 = ccreate(f1, NULL, 2);
+    int tid3 = ccreate(f3, NULL, 0);
+    puts("liberouuu \n");
+    //int tid1 = ccreate(f1, NULL, 0);
 
 
-    cyield();
+    //cyield();
 
 
     puts("Yeah boooy");

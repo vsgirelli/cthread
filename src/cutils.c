@@ -33,35 +33,75 @@ void setYieldingTID(int tid)
 
 }
 
-// procurar thread
-// se encontrou retorna a thread
-// caso contrario, retorna THREAD_NOT_FOUND
-TCB_t * searchThread(int tid)
+TCB_t * searchThreadInQueue(PFILA2 queue, int tid)
 {
 
-
     TCB_t *pThread;
-    FirstFila2(&readyQueuePrio0);
-    pThread = (TCB_t*) GetAtIteratorFila2(&readyQueuePrio0);
+    FirstFila2(queue);
+    pThread = (TCB_t*) GetAtIteratorFila2(queue);
     while(pThread != NULL)
     {
         if(pThread->tid == tid)
         {
             // found thread and return
-            return 0;
+            return pThread;
         }
         else
         {
             // otherwise, keep searching
-            NextFila2(&readyQueuePrio0);
-            pThread = (TCB_t*) GetAtIteratorFila2(&readyQueuePrio0);
+            NextFila2(queue);
+            pThread = (TCB_t*) GetAtIteratorFila2(queue);
         }
     }
-    return THREAD_NOT_FOUND;
+
+    return NULL;
+
+}
+
+// procurar thread
+// se encontrou retorna a thread
+// caso contrario, retorna THREAD_NOT_FOUND
+TCB_t* getThread(int tid)
+{
+    TCB_t* threadFound = searchThreadInQueue(&readyQueuePrio0, tid);
+    if ( threadFound != NULL )
+    {
+        return threadFound;
+    }
+
+    threadFound = searchThreadInQueue(&readyQueuePrio0, tid);
+    if ( threadFound != NULL )
+    {
+        return threadFound;
+    }
+
+    threadFound = searchThreadInQueue(&readyQueuePrio0, tid);
+    if ( threadFound != NULL )
+    {
+        return threadFound;
+    }
+
+    threadFound = searchThreadInQueue(&blockedQueue, tid);
+    if ( threadFound != NULL )
+    {
+        return threadFound;
+    }
+
+    threadFound = searchThreadInQueue(&blockedQueue, tid);
+    if ( threadFound != NULL )
+    {
+        return threadFound;
+    }
+
+    return NULL;
 
 
 }
 
+int searchThread(int tid){
+
+    return FUNC_NOT_IMPLEMENTED;
+}
 // verificar se a mainThread já existe
 int checkMainThread()
 {
@@ -235,7 +275,7 @@ void *scheduler()
     {
 
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio0);
-        DeleteAtIteratorFila2(&readyQueuePrio1);
+        DeleteAtIteratorFila2(&readyQueuePrio0);
         setcontext(&(runningThread->context));
 
     }

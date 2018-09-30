@@ -69,11 +69,12 @@ int initialCreate(void);
 int checkMainThread(void);
 void setRunningThreadPrio(int prio);
 int getRunningThreadPrio(void);
-TCB_t * searchThread(int tid);
+TCB_t * getThread(int tid);
 int createTID();
 int moveCreatedToList(TCB_t* newThread);
 TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
 
+int searchThread(int tid);
 int existsHigherPrioThread(int prio);
 int moveRunningToReady();
 int moveRunningToCjoin();

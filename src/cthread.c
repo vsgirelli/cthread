@@ -131,14 +131,14 @@ int csetprio(int tid, int prio)
         return PRIO_ERROR;
     }
 
-    runningThread->prio = prio;
-
     if ( prio > runningThread->prio)
     {
+        runningThread->prio = prio;
         //Procura para ver se há uma thread com maior prio
         if (existsHigherPrioThread(prio) == 0)
         {
             TCB_t * preemptedThread = runningThread;
+            moveRunningToReady();
             if ( swapcontext(&preemptedThread->context, &schedulerContext) == -1 )
             {
 
@@ -147,8 +147,11 @@ int csetprio(int tid, int prio)
             }
         }
 
-    }
+    } else {
 
+        runningThread->prio = prio;
+
+    }
     return FUNC_WORKING;
 }
 

@@ -8,14 +8,15 @@ int tid2;
 
 void *f1(){
     puts("Thread1 before cjoin");
-    //cjoin(tid2);
+    int err = cjoin(tid2);
+    printf("err: %d\n", err);
     puts("Thread1 after cjoin");
 }
 
 void *f2(){
   puts("Thread2 imprimindo antes de cyield");
-  //int tid1 = ccreate(f1, NULL, 1);
-  //cyield();
+  int tid1 = ccreate(f1, NULL, 1);
+  cyield();
   puts("Thread2 imprimindo depois de cyield");
 }
 

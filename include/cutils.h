@@ -64,19 +64,23 @@ typedef struct cjt {
 } cjoin_thread;
 
 // TODO atualizar a declaração de acordo com a última versão das funções.
-void *scheduler(void);
+void scheduler(void);
 int initialCreate(void);
 int checkMainThread(void);
+void setRunningThreadPrio(int prio);
+int getRunningThreadPrio(void);
+TCB_t * getThread(int tid);
 int createTID();
 int moveCreatedToList(TCB_t* newThread);
 TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
 
+int searchThread(PFILA2 queue, int tid);
+int existsHigherPrioThread(int prio);
 int moveRunningToReady();
 int moveRunningToCjoin();
 int moveRunningToBlocked();
 int moveBlockToReady();
 int isEmptyQueues();
-TCB_t *getThreadToWakeUpAndDelete(PFILA2 queue);
 TCB_t *getThreadAndDelete(PFILA2 queue, int tid);
 int moveRunningToBlocked(void);
 void createThreads(void);

@@ -33,13 +33,6 @@ valéria: isso seria associar a função de término né? e é ela quem chama o 
 bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos criar o contexto do escalonador e da main, usada para marcar isso!
 
 ******************************************************************************/
-void setYieldingTID(int tid)
-{
-
-    yielding_tid = tid;
-
-}
-
 
 // procurar thread em uma determinada lista
 // se encontrou retorna 0
@@ -100,6 +93,7 @@ int canBlock(int tid) {
         return 0;
     return THREAD_NOT_FOUND;
 }
+
 
 // verificar se a mainThread já existe
 int checkMainThread()
@@ -234,9 +228,39 @@ int moveRunningToReady()
 
 }
 
+/**
+    Retorna 0 quando existe uma fila com a prioridade maior que contenha threads em apto.
+*/
+int existsHigherPrioThread(int prio)
+{
+
+    if (prio == 0)
+    {
+
+        return -1;
+
+    }
+
+    else
+    {
+
+        if (prio == 1)
+        {
+            return  FirstFila2(&readyQueuePrio0) ;
+        }
+
+        if (prio == 2)
+        {
+            return  ( FirstFila2(&readyQueuePrio0) && FirstFila2(&readyQueuePrio1) );
+        }
+
+    }
+
+}
+
 // setContext(runningThread->context)
 // seta o contexto atual pro contexto da nova thread
-void *scheduler()
+void scheduler()
 {
 
     // Caso a thread com prio2 nao tenha acabado de fazer um yield e haja thread com prio2
@@ -285,8 +309,7 @@ void checkIfBlocking() {
       // ent�o procurar em blockedQueue pela thread de tid blockedTID
       // e mover esta para a fila de apto correspondente
       moveBlockToReady(cjt->blockedTID);
-      printf("blockedTID: %d\n", cjt->blockedTID);
-
+      DeleteAtIteratorFila2(&cjoinQueue); 
       return;
     }
     else {  
@@ -302,7 +325,7 @@ void checkIfBlocking() {
  * pra liberar recursos e o tcb, e posteriormente chamar o escalonador.
  * Tem que verificar se a thread terminada bloqueava alguém.
  */
-void *terminateThread()
+void terminateThread()
 {
     checkIfBlocking();
 
@@ -379,30 +402,6 @@ int initialCreate()
 
     return FUNC_NOT_IMPLEMENTED;
 
-}
-
-
-// Retorna a thread a ser "acordada" e deleta a mesma da fila do semaforo
-// Caso não tenha thread para acordar, retorna NULL
-TCB_t *getThreadToWakeUpAndDelete(PFILA2 queue)
-{
-    FILA2 *pf;
-    FirstFila2(queue);
-    pf = (FILA2*) GetAtIteratorFila2(queue);
-    while(pf != NULL)
-    {
-        TCB_t *pThread;
-        FirstFila2(pf);
-        pThread = (TCB_t*) GetAtIteratorFila2(pf);
-        if(pThread != NULL)
-        {
-            DeleteAtIteratorFila2(pf);
-            return pThread;
-        }
-        NextFila2(queue);
-        pf = (FILA2*) GetAtIteratorFila2(queue);
-    }
-    return NULL;
 }
 
 TCB_t *getThreadAndDelete(PFILA2 queue, int tid)

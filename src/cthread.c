@@ -29,7 +29,6 @@ Observações:
 
 ******************************************************************************/
 
-int olarc = 0;
 
 int ccreate (void* (*start)(void*), void *arg, int prio)
 {
@@ -59,7 +58,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
 
         runningThread = newThread;
 
-        if ( swapcontext(&(preemptedThread->context), &(runningThread->context)) == -1 )
+        if ( swapcontext(&preemptedThread->context, &runningThread->context) == -1 )
         {
 
             return FUNC_NOT_WORKING;
@@ -134,25 +133,29 @@ int csetprio(int tid, int prio)
     {
         return PRIO_ERROR;
     }
-    // POsso aumentar a prioridade da main?
 
-// setRunningThreadPrio(prio);
-    // if the new priority is lower than the higher priority,
-    // then check if there is any thread with higher priority,
-    // if so, the current thread must suffer preemption.
-    //if (getRunningThreadPrio() < PRIO_2) {
-    // usar as funções da support.h pra percorrer as listas
-    // verifica na fila de prio 2
-    //    se achou, chama função que salva o contexto e bota o TCB pra o apto
-    //              chama scheduler pra selecionar próxima thread.
-    // se vazia, verifica na fila de prio 1
-    //    se achou, chama função que salva o contexto e bota o TCB pra o apto
-    //              chama scheduler pra selecionar próxima thread.
-    // se não achou em 2 e em 1, então não preempta, pq não há nenhuma thread de
-    // prioridade maior
-    //}
+    if ( prio > runningThread->prio)
+    {
+        runningThread->prio = prio;
+        //Procura para ver se há uma thread com maior prio
+        if (existsHigherPrioThread(prio) == 0)
+        {
+            TCB_t * preemptedThread = runningThread;
+            moveRunningToReady();
+            if ( swapcontext(&preemptedThread->context, &schedulerContext) == -1 )
+            {
 
-    return FUNC_NOT_IMPLEMENTED;
+                return FUNC_NOT_WORKING;
+
+            }
+        }
+
+    } else {
+
+        runningThread->prio = prio;
+
+    }
+    return FUNC_WORKING;
 }
 
 /******************************************************************************
@@ -178,7 +181,6 @@ Observações:
 
     (Anotações sobre a cjoin no dúvidas e no labbook)
 ******************************************************************************/
-int olarjoin = 0;
 int cjoin(int tid)
 {
     cjoin_thread *cjt;
@@ -222,7 +224,7 @@ int cjoin(int tid)
   //printf("id da thread bloqueda: %d\n", thread->tid);
 
   // chama scheduler pra selecionar próxima thread.
-  scheduler();
+  swapcontext(&runningThread->context, &schedulerContext);
 
   return 0;
 }
@@ -248,27 +250,12 @@ int csem_init(csem_t *sem, int count)
         initialCreate();
     // inicializar o semaforo
     sem->count = count;
+
+    sem->fila = (PFILA2) malloc(sizeof(FILA2));
     // fila será uma lista de filas, contendo uma fila
     // para cada prioridade
-    sem->fila = (PFILA2) malloc(sizeof(FILA2));
-
     if(CreateFila2(sem->fila) != 0)
         return SEM_INIT_ERROR;
-
-    // cria as filas de prioridade
-    FILA2 filaprio0;
-    FILA2 filaprio1;
-    FILA2 filaprio2;
-    if(CreateFila2(&filaprio0) != 0)
-        return SEM_INIT_ERROR;
-    if(CreateFila2(&filaprio1) != 0)
-        return SEM_INIT_ERROR;
-    if(CreateFila2(&filaprio2) !=0 )
-        return SEM_INIT_ERROR;
-    // Adiciona as filas em ordem de prioridade
-    AppendFila2(sem->fila, (void*) &filaprio0);
-    AppendFila2(sem->fila, (void*) &filaprio1);
-    AppendFila2(sem->fila, (void*) &filaprio2);
 
     return 0;
 }
@@ -303,40 +290,75 @@ int cwait(csem_t *sem)
     // colocar a thread para bloqueado
     if(sem->count < 0)
     {
+        // move para bloqueado
         TCB_t* blockedThread = runningThread;
         if(moveRunningToBlocked() != 0)
         {
             return -1;
         }
-        // como sem->fila eh uma fila de filas de prioridade
-        // eh necessario pegar a fila correta para ser inserido a thread
-        int prio = blockedThread->prio;
-        FILA2 *pf;
+
+        // insere no semaforo para ser acordado pelo csignal
+        // ordenado pela prioridade
+        TCB_t *pThread;
         FirstFila2(sem->fila);
-        pf = (FILA2*) GetAtIteratorFila2(sem->fila);
-        int i;
-        for(i=0; i<prio; i++)
+        pThread = (TCB_t*) GetAtIteratorFila2(sem->fila);
+        // caso a fila esta vazia ou eh de menos prio
+        // insere no final
+        if(pThread == NULL || blockedThread->prio == 2)
         {
-            NextFila2(sem->fila);
-            pf = (FILA2*) GetAtIteratorFila2(sem->fila);
+            if(AppendFila2(sem->fila, (void*)blockedThread) != 0)
+            {
+                return -1;
+            }
         }
-        // apos encontrar a fila correta, insere
-        if(AppendFila2(pf, (void*)blockedThread) != 0)
+        // caso a prio eh a mais alta
+        // insere no inicio
+        else if(blockedThread->prio == 0)
         {
-            return -1;
+            InsertBeforeIteratorFila2(sem->fila, blockedThread);
+        }
+        // caso seja de media prioridade, ver onde colocar
+        else
+        {
+            //itera sobre a lista do sem
+            int bf = -1;
+            while(pThread != NULL)
+            {
+                // caso a prioridade da thread a ser bloqueada eh a maior
+                if(pThread->prio > blockedThread->prio)
+                {
+                    // para o laco e adiciona um boleano dizendo que sera
+                    // inserida antes da thread corrente
+                    bf = 0;
+                    break;
+                }
+                else
+                {
+                    NextFila2(sem->fila);
+                    pThread = (TCB_t*) GetAtIteratorFila2(sem->fila);
+                }
+            }
+            // caso nao precise inserir antes, significa que soh ha threads
+            // de maior prioridade, entao bf = -1 e insere no final da fila
+            if(bf==0)
+                InsertBeforeIteratorFila2(sem->fila, blockedThread);
+            else
+                AppendFila2(sem->fila, (void*)blockedThread);
         }
         // escalonador ira colocar alguem para ser executado
+        TCB_t * exitedThread = runningThread;
 
-        if ( swapcontext(&blockedThread->context, &schedulerContext) == -1 )
+        if ( swapcontext(&exitedThread->context, &schedulerContext) == -1 )
         {
 
             return FUNC_NOT_WORKING;
 
         }
-
+        //scheduler();
     }
     return 0;
 }
+
 /******************************************************************************
 Parâmetros:
   sem:ponteiro para uma variável do tipo semáforo.
@@ -372,24 +394,29 @@ int csignal(csem_t *sem)
     if(FirstFila2(sem->fila) == 0)
     {
         // Pega o primeiro para acordar e remove da fila
-        TCB_t* wakeThread = (TCB_t*) getThreadToWakeUpAndDelete(sem->fila);
+        TCB_t* wakeThread = (TCB_t*) GetAtIteratorFila2(sem->fila);
+
+        DeleteAtIteratorFila2(sem->fila);
+
         // Remove da fila de bloqueado e colocar para apto
         if(wakeThread->state == PROCST_BLOQ)
         {
-            if(moveBlockToReady(&wakeThread->tid) < 0)
+            if(moveBlockToReady(wakeThread->tid) < 0)
             {
                 return -1;
             }
             // como a movimentacao para a fila de apto
             // eh necessario chamar o escalonador
-            if(runningThread->prio > wakeThread->prio) {
-                TCB_t* preemptedThread = runningThread;
-                if ( swapcontext(&preemptedThread->context, &schedulerContext) == -1 )
+            if(runningThread->prio > wakeThread->prio){
+                TCB_t * preemptedThread = runningThread;
+
+                if ( swapcontext(&preemptedThread->context, &wakeThread->context) == -1 )
                 {
 
                     return FUNC_NOT_WORKING;
 
                 }
+                //scheduler();
             }
         }
         else
@@ -399,7 +426,6 @@ int csignal(csem_t *sem)
     }
     return FUNC_WORKING;
 }
-
 
 /******************************************************************************
 Parâmetros:

@@ -15,9 +15,15 @@ void *f2(){
 }
 
 void *f1(){
-    puts("Thread1 imprimindo");
-    csignal(&semaphore1);
+
+    puts("Thread1 imprimindo antes do setprio");
+    int tid = ccreate(f3, NULL, 1);
+    puts("Nao preemptou por prioridade");
+    int x = csetprio(0, 2);
+    puts("Thread1 imprimindo apos do setprio");
+    //csignal(&semaphore1);
 }
+
 
 int main (void)
 {
@@ -27,25 +33,12 @@ int main (void)
     //puts(name);
     int sid = csem_init(&semaphore1, 0);
 
-    //int tid = ccreate(f3, NULL, 2);
-    int tid2 = ccreate(f2, NULL, 2);
-    int tid3 = ccreate(f1, NULL, 2);
+    //int tid = ccreate(f3, NULL, 1);
+    //int tid2 = ccreate(f2, NULL, 2);
+    int tid3 = ccreate(f1, NULL, 1);
 
-
+    puts("Ainda nao fez o yield");
     cyield();
 
 
-    puts("Yeah boooy");
-
-
-
-
-    puts("nao preempta");
-
-
-    //int return_value = cyield();
-
-
-    //int id3 = ccreate(f1, NULL, 1);
-    printf("Main saindo...");
 }

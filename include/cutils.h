@@ -77,5 +77,9 @@ TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid);
 int moveRunningToReady();
 int moveRunningToCjoin();
 int moveRunningToBlocked();
+int moveBlockToReady();
 int isEmptyQueues();
+TCB_t *getThreadToWakeUpAndDelete(PFILA2 queue);
+TCB_t *getThreadAndDelete(PFILA2 queue, int tid);
+
 #endif

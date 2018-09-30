@@ -55,13 +55,16 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
 
         runningThread = newThread;
 
-        if ( swapcontext(&(preemptedThread->context), &(runningThread->context)) == -1 ) {
+        if ( swapcontext(&(preemptedThread->context), &(runningThread->context)) == -1 )
+        {
 
             return FUNC_NOT_WORKING;
 
         }
 
-    } else {
+    }
+    else
+    {
         moveCreatedToList(newThread);
 
     }
@@ -87,7 +90,8 @@ int cyield(void)
 {
     TCB_t* yieldingThread;
 
-    if (isEmptyQueues()){
+    if (isEmptyQueues())
+    {
         // Nothing to do, continua o fluxo da thread
         return FUNC_WORKING;
     }
@@ -96,7 +100,8 @@ int cyield(void)
 
     moveRunningToReady();
 
-    if ( swapcontext(&yieldingThread->context, &schedulerContext) == -1){
+    if ( swapcontext(&yieldingThread->context, &schedulerContext) == -1)
+    {
 
         return FUNC_NOT_WORKING;
 
@@ -224,8 +229,35 @@ Observações:
 ******************************************************************************/
 int csem_init(csem_t *sem, int count)
 {
-    return FUNC_NOT_IMPLEMENTED;
+    if(checkMainThread() != 0 )
+        initialCreate();
+    // inicializar o semaforo
+    sem->count = count;
+    // fila será uma lista de filas, contendo uma fila
+    // para cada prioridade
+    sem->fila = (PFILA2) malloc(sizeof(FILA2));
+
+    if(CreateFila2(sem->fila) != 0)
+        return SEM_INIT_ERROR;
+
+    // cria as filas de prioridade
+    FILA2 filaprio0;
+    FILA2 filaprio1;
+    FILA2 filaprio2;
+    if(CreateFila2(&filaprio0) != 0)
+        return SEM_INIT_ERROR;
+    if(CreateFila2(&filaprio1) != 0)
+        return SEM_INIT_ERROR;
+    if(CreateFila2(&filaprio2) !=0 )
+        return SEM_INIT_ERROR;
+    // Adiciona as filas em ordem de prioridade
+    AppendFila2(sem->fila, (void*) &filaprio0);
+    AppendFila2(sem->fila, (void*) &filaprio1);
+    AppendFila2(sem->fila, (void*) &filaprio2);
+
+    return 0;
 }
+
 
 /******************************************************************************
 Parâmetros:
@@ -246,9 +278,50 @@ Observações:
 ******************************************************************************/
 int cwait(csem_t *sem)
 {
-    return FUNC_NOT_IMPLEMENTED;
-}
+    if(checkMainThread() != 0 )
+        initialCreate();
+    if(sem == NULL)
+    {
+        return NOT_INITIALIZED_SEM;
+    }
+    sem->count = sem->count - 1;
+    // colocar a thread para bloqueado
+    if(sem->count < 0)
+    {
+        TCB_t* blockedThread = runningThread;
+        if(moveRunningToBlocked() != 0)
+        {
+            return -1;
+        }
+        // como sem->fila eh uma fila de filas de prioridade
+        // eh necessario pegar a fila correta para ser inserido a thread
+        int prio = blockedThread->prio;
+        FILA2 *pf;
+        FirstFila2(sem->fila);
+        pf = (FILA2*) GetAtIteratorFila2(sem->fila);
+        int i;
+        for(i=0; i<prio; i++)
+        {
+            NextFila2(sem->fila);
+            pf = (FILA2*) GetAtIteratorFila2(sem->fila);
+        }
+        // apos encontrar a fila correta, insere
+        if(AppendFila2(pf, (void*)blockedThread) != 0)
+        {
+            return -1;
+        }
+        // escalonador ira colocar alguem para ser executado
 
+        if ( swapcontext(&blockedThread->context, &schedulerContext) == -1 )
+        {
+
+            return FUNC_NOT_WORKING;
+
+        }
+
+    }
+    return 0;
+}
 /******************************************************************************
 Parâmetros:
   sem:ponteiro para uma variável do tipo semáforo.
@@ -272,8 +345,46 @@ Observações:
 ******************************************************************************/
 int csignal(csem_t *sem)
 {
-    return FUNC_NOT_IMPLEMENTED;
+    if(checkMainThread() != 0 )
+        initialCreate();
+    if(sem == NULL)
+    {
+        return NOT_INITIALIZED_SEM;
+    }
+
+    sem->count = sem->count + 1;
+    // Se fila não está vazia
+    if(FirstFila2(sem->fila) == 0)
+    {
+        // Pega o primeiro para acordar e remove da fila
+        TCB_t* wakeThread = (TCB_t*) getThreadToWakeUpAndDelete(sem->fila);
+        // Remove da fila de bloqueado e colocar para apto
+        if(wakeThread->state == PROCST_BLOQ)
+        {
+            if(moveBlockToReady(&wakeThread->tid) < 0)
+            {
+                return -1;
+            }
+            // como a movimentacao para a fila de apto
+            // eh necessario chamar o escalonador
+            if(runningThread->prio > wakeThread->prio) {
+                TCB_t* preemptedThread = runningThread;
+                if ( swapcontext(&preemptedThread->context, &schedulerContext) == -1 )
+                {
+
+                    return FUNC_NOT_WORKING;
+
+                }
+            }
+        }
+        else
+        {
+            return THREAD_NOT_BLOCKED;
+        }
+    }
+    return FUNC_WORKING;
 }
+
 
 /******************************************************************************
 Parâmetros:
@@ -290,7 +401,8 @@ int cidentify (char *name, int size)
 {
     char* componentes = "Leandro Pereira - 00273114 \nPedro Trindade - 00264846\nValeria Girelli - 00261596";
 
-    if (strlen(componentes) > size) {
+    if (strlen(componentes) > size)
+    {
         return INSUFICIENT_SIZE;
     }
 

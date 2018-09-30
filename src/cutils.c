@@ -26,7 +26,8 @@ valéria: isso seria associar a função de término né? e é ela quem chama o 
 bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos criar o contexto do escalonador e da main, usada para marcar isso!
 
 ******************************************************************************/
-void setYieldingTID(int tid){
+void setYieldingTID(int tid)
+{
 
     yielding_tid = tid;
 
@@ -71,7 +72,7 @@ TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid)
         Definicao dos atributos do TCB
     */
     newThread->tid = tid;
-    newThread->state = THREAD_STATE_READY;
+    newThread->state = PROCST_APTO;
     newThread->prio = prio;
     newThread->data = NULL;
 
@@ -101,16 +102,36 @@ int createTID()
     return ++numTID;
 
 }
-// moveRunningToBlocked (ou Cjoin):
-// runningThread->context = getContext()
-// salva o contexto em Execução
 
 // AppendFila2(blockedQueue, runningThread) (ou
 // salva na fila de aptos a thread que vai ser preemptada
 int moveRunningToBlocked()
 {
+    TCB_t* blockedThread = runningThread;
+
+    blockedThread->state = PROCST_BLOQ;
+
+    if(AppendFila2(&blockedQueue, (void*)blockedThread) != 0)
+    {
+        return -1;
+    }
     return FUNC_WORKING;
 }// ou cjoinQueue
+
+int moveBlockToReady(int tid)
+{
+    // pega a thread bloqueada
+    TCB_t* thread = getThreadAndDelete(&blockedQueue, tid);
+
+    thread->state = PROCST_APTO;
+
+    PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(runningThread);
+
+    AppendFila2(FilaCorrespondente, runningThread);
+
+    return FUNC_WORKING;
+}
+
 
 int moveRunningToCjoin()
 {
@@ -142,7 +163,8 @@ int moveRunningToReady()
 
     PFILA2 FilaCorrespondente = getThreadReadyPrioQueue(runningThread);
 
-    if ( AppendFila2(FilaCorrespondente, runningThread) ){
+    if ( AppendFila2(FilaCorrespondente, runningThread) )
+    {
 
         return FUNC_NOT_WORKING;
 
@@ -160,14 +182,16 @@ void *scheduler()
 {
 
     // Caso a thread com prio2 nao tenha acabado de fazer um yield e haja thread com prio2
-    if (FirstFila2(&readyQueuePrio0) == 0 ){
+    if (FirstFila2(&readyQueuePrio0) == 0 )
+    {
 
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio0);
         setcontext(&(runningThread->context));
 
     }
 
-    else if (FirstFila2(&readyQueuePrio1) == 0 ) {
+    else if (FirstFila2(&readyQueuePrio1) == 0 )
+    {
 
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio1);
         setcontext(&(runningThread->context));
@@ -175,7 +199,8 @@ void *scheduler()
     }
 
 
-    else if (FirstFila2(&readyQueuePrio2) == 0 ){
+    else if (FirstFila2(&readyQueuePrio2) == 0 )
+    {
 
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio2);
         DeleteAtIteratorFila2(&readyQueuePrio2);
@@ -205,7 +230,8 @@ void *terminateThread()
 }
 
 
-int isEmptyQueues(){
+int isEmptyQueues()
+{
 
     return FirstFila2(&readyQueuePrio0) && FirstFila2(&readyQueuePrio1) && FirstFila2(&readyQueuePrio2);
 
@@ -269,3 +295,47 @@ int initialCreate()
 }
 
 
+// Retorna a thread a ser "acordada" e deleta a mesma da fila do semaforo
+// Caso não tenha thread para acordar, retorna NULL
+TCB_t *getThreadToWakeUpAndDelete(PFILA2 queue)
+{
+    FILA2 *pf;
+    FirstFila2(queue);
+    pf = (FILA2*) GetAtIteratorFila2(queue);
+    while(pf != NULL)
+    {
+        TCB_t *pThread;
+        FirstFila2(pf);
+        pThread = (TCB_t*) GetAtIteratorFila2(pf);
+        if(pThread != NULL)
+        {
+            DeleteAtIteratorFila2(pf);
+            return pThread;
+        }
+        NextFila2(queue);
+        pf = (FILA2*) GetAtIteratorFila2(queue);
+    }
+    return NULL;
+}
+
+TCB_t *getThreadAndDelete(PFILA2 queue, int tid)
+{
+    TCB_t *pThread;
+    FirstFila2(queue);
+    pThread = (TCB_t*) GetAtIteratorFila2(queue);
+    while(pThread != NULL)
+    {
+        if(pThread->tid == tid)
+        {
+            DeleteAtIteratorFila2(queue);
+            return pThread;
+        }
+        else
+        {
+            // otherwise, keep searching
+            NextFila2(queue);
+            pThread = (TCB_t*) GetAtIteratorFila2(queue);
+        }
+    }
+    return NULL;
+}

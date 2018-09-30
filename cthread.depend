@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1538263908 source:/home/aluno/Desktop/diretorio/pedro/src/cthread.c
+1538337457 source:/home/aluno/Desktop/diretorio/pedro/src/cthread.c
 	"../include/support.h"
 	"../include/cdata.h"
 	"../include/config.h"
@@ -58,7 +58,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1538191255 source:/home/aluno/Desktop/diretorio/pedro/src/main.c
+1538263997 source:/home/aluno/Desktop/diretorio/pedro/src/main.c
 	<stdio.h>
 	"../include/support.h"
 	"../include/cthread.h"

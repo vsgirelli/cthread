@@ -6,8 +6,6 @@
 #include "../include/cdata.h"
 #include "../include/support.h"
 #include "../include/cutils.h"
-// o ideal seria apenas adicionarmos a cthread.h, porém não podemos adicionar
-// lá a cutils.h
 
 /******************************************************************************
 Parâmetros:
@@ -28,11 +26,8 @@ Observações:
   * Quando um thread de maior prioridade for criada, a thread criadora deve ser preemptada.
 
 ******************************************************************************/
-
-
 int ccreate (void* (*start)(void*), void *arg, int prio)
 {
-
     int tid;
     TCB_t* newThread = NULL;
     if(checkMainThread() != 0 )
@@ -49,29 +44,20 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
 
     newThread = createThread(start, arg, prio, tid);
 
-
     if (newThread->prio < runningThread->prio)
     {
         TCB_t * preemptedThread = runningThread;
-
         moveRunningToReady();
-
         runningThread = newThread;
-
         if ( swapcontext(&preemptedThread->context, &runningThread->context) == -1 )
         {
-
             return FUNC_NOT_WORKING;
-
         }
-
     }
     else
     {
         moveCreatedToList(newThread);
-
     }
-
 
     return tid;
 }
@@ -105,9 +91,7 @@ int cyield(void)
 
     if ( swapcontext(&yieldingThread->context, &schedulerContext) == -1)
     {
-
         return FUNC_NOT_WORKING;
-
     }
 
     return FUNC_WORKING;
@@ -214,11 +198,7 @@ int cjoin(int tid)
   // salvar o contexto e bota o TCB da runningThread pra bloqueado
   moveRunningToBlocked();
 
-  //FirstFila2(&blockedQueue);
-  //TCB_t *thread = GetAtIteratorFila2(&blockedQueue);
-  //printf("id da thread bloqueda: %d\n", thread->tid);
-
-  // chama scheduler pra selecionar próxima thread.
+  // troca o contexto sendo executado
   swapcontext(&runningThread->context, &schedulerContext);
 
   return 0;

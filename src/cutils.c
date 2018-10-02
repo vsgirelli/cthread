@@ -14,25 +14,9 @@
 #include <ucontext.h>
 #include <string.h>
 
-
 int numTID = 0;
 int mainThreadInitialized = 0;
 int yielding_tid = -1;
-
-// PEDRO THINGS (remove o que tu acha que é removível Pebronha)
-/******************************************************************************
-Globais que acho que precisaremos:
-
-u_context runningThread: Contexto da thread em execução
-valéria: eu acho que não é um contexto, pelo que falamos hoje, é um TCB mesmo
-u_context scheduler: Contexto do escalonador, precisamos associar esse contexto ao u_link de cada thread criada
-valéria: isso seria associar a função de término né? e é ela quem chama o escalonador, certo?
-
-* Filas *
-
-bool cthreadStarted: Na primeira chamada de alguma funcao da lib precisamos criar o contexto do escalonador e da main, usada para marcar isso!
-
-******************************************************************************/
 
 // procurar thread em uma determinada lista
 // se encontrou retorna 0
@@ -98,7 +82,6 @@ int canBlock(int tid) {
 // verificar se a mainThread já existe
 int checkMainThread()
 {
-
     if(mainThreadInitialized == 0)
     {
         return 1;
@@ -108,7 +91,6 @@ int checkMainThread()
 
 TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid)
 {
-
     TCB_t * newThread = (TCB_t*) malloc(sizeof(TCB_t)) ;
 
     /**
@@ -167,7 +149,7 @@ int moveRunningToBlocked()
         return -1;
     }
     return FUNC_WORKING;
-}// ou cjoinQueue
+}
 
 int moveBlockToReady(int tid)
 {
@@ -216,15 +198,11 @@ int moveRunningToReady()
 
     if ( AppendFila2(FilaCorrespondente, runningThread) )
     {
-
         return FUNC_NOT_WORKING;
-
     }
 
     runningThread = NULL;
-
     return FUNC_WORKING;
-
 }
 
 /**
@@ -254,34 +232,24 @@ int existsHigherPrioThread(int prio)
 // seta o contexto atual pro contexto da nova thread
 void scheduler()
 {
-
     // Caso a thread com prio2 nao tenha acabado de fazer um yield e haja thread com prio2
     if (FirstFila2(&readyQueuePrio0) == 0 )
     {
-
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio0);
         DeleteAtIteratorFila2(&readyQueuePrio0);
         setcontext(&(runningThread->context));
-
     }
-
     else if (FirstFila2(&readyQueuePrio1) == 0 )
     {
-
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio1);
         DeleteAtIteratorFila2(&readyQueuePrio1);
         setcontext(&(runningThread->context));
-
     }
-
-
     else if (FirstFila2(&readyQueuePrio2) == 0 )
     {
-
         runningThread = (TCB_t *) GetAtIteratorFila2(&readyQueuePrio2);
         DeleteAtIteratorFila2(&readyQueuePrio2);
         setcontext(&(runningThread->context));
-
     }
 }
 
@@ -333,18 +301,15 @@ void terminateThread()
 
 int isEmptyQueues()
 {
-
     return FirstFila2(&readyQueuePrio0) && FirstFila2(&readyQueuePrio1) && FirstFila2(&readyQueuePrio2);
-
 }
+
 // cria main
 // inicializar as filas (support.h)
 // cria contexto pra chamada da terminateThread
 int initialCreate()
 {
-
     mainThreadInitialized = 1;
-
     /**
         Criacao das filas
     */
@@ -358,9 +323,7 @@ int initialCreate()
 
     CreateFila2(&cjoinQueue);
 
-
     /** Criacao da mainThread
-
     */
     mainThread = (TCB_t*) malloc(sizeof(TCB_t)) ;
 
@@ -374,7 +337,6 @@ int initialCreate()
     runningThread = mainThread;
 
     /** Inicia o terminate context
-
     */
     getcontext(&terminateContext);
     terminateContext.uc_stack.ss_sp = (char *) malloc (SIGSTKSZ);
@@ -383,7 +345,6 @@ int initialCreate()
     makecontext(&terminateContext, (void (*)(void)) terminateThread , 0);
 
     /** Inicia o scheduler context
-
     */
     getcontext(&schedulerContext);
     schedulerContext.uc_stack.ss_sp = (char *) malloc (SIGSTKSZ);
@@ -392,7 +353,6 @@ int initialCreate()
     makecontext(&schedulerContext, (void (*)(void)) scheduler , 0);
 
     return FUNC_NOT_IMPLEMENTED;
-
 }
 
 TCB_t *getThreadAndDelete(PFILA2 queue, int tid)

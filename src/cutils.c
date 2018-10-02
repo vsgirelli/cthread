@@ -133,7 +133,6 @@ TCB_t* createThread(void* (*start)(void*), void *arg, int prio, int tid)
 
 PFILA2 getThreadReadyPrioQueue( TCB_t * thread)
 {
-
     if (thread->prio == 0 )
     {
         return &readyQueuePrio0;
@@ -146,7 +145,7 @@ PFILA2 getThreadReadyPrioQueue( TCB_t * thread)
     {
         return &readyQueuePrio2;
     }
-
+    return NULL;
 }
 
 int createTID()
@@ -233,29 +232,22 @@ int moveRunningToReady()
 */
 int existsHigherPrioThread(int prio)
 {
-
     if (prio == 0)
     {
-
         return -1;
-
     }
-
     else
     {
-
         if (prio == 1)
         {
-            return  FirstFila2(&readyQueuePrio0) ;
+            return FirstFila2(&readyQueuePrio0);
         }
-
         if (prio == 2)
         {
-            return  ( FirstFila2(&readyQueuePrio0) && FirstFila2(&readyQueuePrio1) );
+            return (FirstFila2(&readyQueuePrio0) && FirstFila2(&readyQueuePrio1));
         }
-
     }
-
+    return -1;
 }
 
 // setContext(runningThread->context)
@@ -291,7 +283,6 @@ void scheduler()
         setcontext(&(runningThread->context));
 
     }
-printf("runningThread->tid: %d\n", runningThread->tid);
 }
 
 /*

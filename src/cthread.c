@@ -144,16 +144,11 @@ int csetprio(int tid, int prio)
             moveRunningToReady();
             if ( swapcontext(&preemptedThread->context, &schedulerContext) == -1 )
             {
-
                 return FUNC_NOT_WORKING;
-
             }
         }
-
     } else {
-
         runningThread->prio = prio;
-
     }
     return FUNC_WORKING;
 }

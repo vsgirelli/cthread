@@ -6,7 +6,6 @@
 #include "../include/cdata.h"
 
 
-/**
 int ccreate (void* (*start)(void*), void *arg, int prio) {
 	return -1;
 }
@@ -41,4 +40,3 @@ int cidentify (char *name, int size) {
 }
 
 
-*/

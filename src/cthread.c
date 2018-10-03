@@ -33,6 +33,7 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
     if(checkMainThread() != 0 )
         initialCreate();
 
+    printf("olar\n");
     // Verifica prioridade
     if (prio < PRIO_0 || prio > PRIO_2)
     {
@@ -40,7 +41,6 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
     }
 
     tid = createTID();
-    //printf("olar %d\n", olarc++);
 
     newThread = createThread(start, arg, prio, tid);
 
@@ -164,7 +164,6 @@ int cjoin(int tid)
 {
     cjoin_thread *cjt;
 
-  //printf("olar cjoin %d\n", olarjoin++);
     if(checkMainThread() != 0)
     {
         if (initialCreate() != 0)
@@ -184,7 +183,6 @@ int cjoin(int tid)
     return err;
   }
 
-  //printf("olar cjoin %d\n", olarjoin++);
   // TODO Verificar se não é um pedido de espera para a main (erro?)
 
   // se o tid existe e não bloqueia ninguém,
@@ -415,7 +413,7 @@ Retorno:
 ******************************************************************************/
 int cidentify (char *name, int size)
 {
-    char* componentes = "Leandro Pereira - 00273114 \nPedro Trindade - 00264846\nValeria Girelli - 00261596";
+    char* componentes = "Leandro Pereira - 00273114\nPedro Trindade - 00264846\nValeria Girelli - 00261596";
 
     if (strlen(componentes) > size)
     {

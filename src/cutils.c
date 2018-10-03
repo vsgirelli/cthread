@@ -177,7 +177,6 @@ int moveRunningToCjoin()
 */
 int moveCreatedToList(TCB_t* newThread)
 {
-
     PFILA2 filaCorrespondente = getThreadReadyPrioQueue(newThread);
 
     if ( AppendFila2(filaCorrespondente, newThread) )
@@ -185,8 +184,8 @@ int moveCreatedToList(TCB_t* newThread)
         return FUNC_NOT_WORKING;
     }
 
+    printf("olar\n");
     return FUNC_WORKING;
-
 }
 
 // Salva na fila de aptos a thread que vai ser preemptada

@@ -33,7 +33,6 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
     if(checkMainThread() != 0 )
         initialCreate();
 
-    printf("olar\n");
     // Verifica prioridade
     if (prio < PRIO_0 || prio > PRIO_2)
     {
@@ -56,7 +55,9 @@ int ccreate (void* (*start)(void*), void *arg, int prio)
     }
     else
     {
-        moveCreatedToList(newThread);
+        if (moveCreatedToList(newThread) != 0) {
+          return FUNC_WORKING;
+        }
     }
 
     return tid;

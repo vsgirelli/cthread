@@ -5,10 +5,6 @@ LIB_DIR=../lib
 
 all: teste0 teste1 teste2 teste3 teste4 teste5 teste6 teste7
 
-clean:
-	rm -rf teste0 teste1 teste2 teste3 teste4 teste5 teste6 teste7
-	rm -rf teste?.o *~ *log
-
 teste0: teste0.c $(LIB_DIR)/libcthread.a
 	$(CC) -o teste1 teste0.c -L..$(LIB_DIR) -lcthread -Wall
 
@@ -33,6 +29,6 @@ teste6: teste6.c $(LIB_DIR)/libcthread.a
 teste7: teste7.c $(LIB_DIR)/libcthread.a
 	$(CC) -o teste7 teste7.c -L..$(LIB_DIR) -lcthread -Wall
 
-
-
-
+clean:
+	rm -rf teste0 teste1 teste2 teste3 teste4 teste5 teste6 teste7
+	rm -rf teste?.o *~ *log

@@ -184,7 +184,6 @@ int moveCreatedToList(TCB_t* newThread)
         return FUNC_NOT_WORKING;
     }
 
-    printf("olar\n");
     return FUNC_WORKING;
 }
 

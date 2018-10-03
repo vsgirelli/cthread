@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include "../include/cthread.h"
 
-int tid[3];
+int tid[20];
+int tid2[20];
 int itid = 0;
 
 void *th2(void) {
@@ -16,8 +17,6 @@ void *th2(void) {
 void *th(void *param) {
   int cont=100;
 
-  //itid++;
-  //tid[itid] = ccreate(th2, NULL, 1);
 
  // while(cont) {
    // printf ("%d\n",param);

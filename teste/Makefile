@@ -1,26 +1,37 @@
+# Makefile para geração de programas teste
 
-all:	caso0 caso1 caso2 caso3 caso50 caso51 caso6 caso7
+CC=gcc
+LIB_DIR=../lib
+
+all: teste0 teste1 teste2 teste3 teste4 teste5 teste6 teste7
 
 clean:
-	rm -rf caso0 caso1 caso2 caso3 caso50 caso51 caso6 caso7
-	rm -rf caso?.o caso??.o caso??.o *~ *log
-	
-caso0: caso0.c
-	gcc -o caso0 caso0.c ../bin/support.o -L../lib -lcthread -Wall
-caso1: caso1.c
-	gcc -o caso1 caso1.c ../bin/support.o -L../lib -lcthread -Wall
-caso2: caso2.c
-	gcc -o caso2 caso2.c ../bin/support.o -L../lib -lcthread -Wall
-caso3: caso3.c
-	gcc -o caso3 caso3.c ../bin/support.o -L../lib -lcthread -Wall
-caso50: caso50.c
-	gcc -o caso50 caso50.c ../bin/support.o -L../lib -lcthread -Wall
-caso51: caso51.c
-	gcc -o caso51 caso51.c ../bin/support.o -L../lib -lcthread -Wall
-caso6: caso6.c
-	gcc -o caso6 caso6.c ../bin/support.o -L../lib -lcthread -Wall
-caso7: caso7.c
-	gcc -o caso7 caso7.c ../bin/support.o -L../lib -lcthread -Wall
+	rm -rf teste0 teste1 teste2 teste3 teste4 teste5 teste6 teste7
+	rm -rf teste?.o *~ *log
+
+teste0: teste0.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste1 teste0.c -L..$(LIB_DIR) -lcthread -Wall
+
+teste1: teste1.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste1 teste1.c -L..$(LIB_DIR) -lcthread -Wall
+
+teste2: teste2.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste2 teste2.c -L..$(LIB_DIR) -lcthread -Wall
+
+teste3: teste3.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste3 teste3.c -L..$(LIB_DIR) -lcthread -Wall
+
+teste4: teste4.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste4 teste4.c  -L..$(LIB_DIR) -lcthread -Wall
+
+teste5: teste5.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste5 teste5.c -L..$(LIB_DIR) -lcthread -Wall
+
+teste6: teste6.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste6 teste6.c -L..$(LIB_DIR) -lcthread -Wall
+
+teste7: teste7.c $(LIB_DIR)/libcthread.a
+	$(CC) -o teste7 teste7.c -L..$(LIB_DIR) -lcthread -Wall
 
 
 

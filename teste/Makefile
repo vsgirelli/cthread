@@ -1,34 +1,35 @@
-# Makefile para geração de programas teste
+#
+# Makefile de EXEMPLO
+#
+# OBRIGATÓRIO ter uma regra "all" para geração da biblioteca e de uma
+# regra "clean" para remover todos os objetos gerados.
+#
+# É NECESSARIO ADAPTAR ESSE ARQUIVO de makefile para suas necessidades.
+#  1. Cuidado com a regra "clean" para não apagar o "support.o"
+#
+# OBSERVAR que as variáveis de ambiente consideram que o Makefile está no diretótio "cthread"
 
 CC=gcc
-LIB_DIR=../lib
+LIB_DIR=./lib
+INC_DIR=./include
+BIN_DIR=./bin
+SRC_DIR=./src
 
-all: teste0 teste1 teste2 teste3 teste4 teste5 teste6 teste7
+# bibliotecas extras (tipo math.h) que forem adicionadas
+# LIBS=
 
-teste0: teste0.c $(LIB_DIR)/libcthread.a
-	$(CC) -o teste1 teste0.c -L..$(LIB_DIR) -lcthread -Wall
+OBJS=$(BIN_DIR)/support.o $(BIN_DIR)/cutils.o $(BIN_DIR)/cthread.o
 
-teste1: teste1.c $(LIB_DIR)/libcthread.a
-	$(CC) -o teste1 teste1.c -L..$(LIB_DIR) -lcthread -Wall
+all: $(BIN_DIR)/cutils.o $(BIN_DIR)/cthread.o
+	ar crs $(LIB_DIR)/libcthread.a $(OBJS)
 
-teste2: teste2.c $(LIB_DIR)/libcthread.a
-	$(CC) -o teste2 teste2.c -L..$(LIB_DIR) -lcthread -Wall
+$(BIN_DIR)/cutils.o: $(SRC_DIR)/cutils.c
+	gcc -c $(SRC_DIR)/cutils.c -o $(BIN_DIR)/cutils.o -Wall
 
-teste3: teste3.c $(LIB_DIR)/libcthread.a
-	$(CC) -o teste3 teste3.c -L..$(LIB_DIR) -lcthread -Wall
-
-teste4: teste4.c $(LIB_DIR)/libcthread.a
-	$(CC) -o teste4 teste4.c  -L..$(LIB_DIR) -lcthread -Wall
-
-teste5: teste5.c $(LIB_DIR)/libcthread.a
-	$(CC) -o teste5 teste5.c -L..$(LIB_DIR) -lcthread -Wall
-
-teste6: teste6.c $(LIB_DIR)/libcthread.a
-	$(CC) -o teste6 teste6.c -L..$(LIB_DIR) -lcthread -Wall
-
-teste7: teste7.c $(LIB_DIR)/libcthread.a
-	$(CC) -o teste7 teste7.c -L..$(LIB_DIR) -lcthread -Wall
+$(BIN_DIR)/cthread.o: $(SRC_DIR)/cthread.c
+	gcc -c $(SRC_DIR)/cthread.c -o $(BIN_DIR)/cthread.o -Wall
 
 clean:
-	rm -rf teste0 teste1 teste2 teste3 teste4 teste5 teste6 teste7
-	rm -rf teste?.o *~ *log
+	mv $(BIN_DIR)/support.o ../
+	rm -rf $(LIB_DIR)/*.a $(BIN_DIR)/*.o $(SRC_DIR)/*~ $(INC_DIR)/*~ *~
+	mv ../support.o $(BIN_DIR)

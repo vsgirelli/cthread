@@ -1,17 +1,10 @@
-/*
-A simple test that probably won't work :)
-*/
-
-#include "../include/cdata.h"
 #include "../include/cthread.h"
-#include "../include/support.h"
 #include <stdio.h>
-#include <ucontext.h>
 #include <stdlib.h>
 
 csem_t semaphore;
 
-void* PrintsSomething()
+void* th()
 {
     cwait(&semaphore);
     printf("and this should appear after that!\n");
@@ -19,24 +12,28 @@ void* PrintsSomething()
     return NULL;
 }
 
-void* PrintsAnotherThing()
+void* th2()
 {
     cwait(&semaphore);
-    printf("This will be the last one!");
+    printf("This will be the last one!\n");
     csignal(&semaphore);
     return NULL;
 }
 
 int main()
 {
-    csem_init(&semaphore, 1);
+    int err = csem_init(&semaphore, 1);
+    //printf("err %d\n", err);
     cwait(&semaphore);
-    ccreate(PrintsSomething, 0, 0);
-    ccreate(PrintsAnotherThing, 0, 0);
+    ccreate(th, NULL, 0);
+    ccreate(th2, NULL, 0);
     cyield();
+
     printf("This should appear first\n");
     csignal(&semaphore);
+    printf("olar\n");
     cyield();
     cyield();
+
     return 0;
 }

@@ -78,10 +78,14 @@ Observações:
 ******************************************************************************/
 int cyield(void)
 {
+    if(checkMainThread() != 0 )
+        initialCreate();
+
     TCB_t* yieldingThread;
 
     if (isEmptyQueues())
     {
+      printf("queues vazias\n");
         // Nothing to do, continua o fluxo da thread
         return FUNC_WORKING;
     }
@@ -89,6 +93,7 @@ int cyield(void)
     yieldingThread = runningThread;
 
     moveRunningToReady();
+      printf("queues not vazias\n");
 
     if ( swapcontext(&yieldingThread->context, &schedulerContext) == -1)
     {
@@ -114,6 +119,9 @@ Observações:
 ******************************************************************************/
 int csetprio(int tid, int prio)
 {
+    if(checkMainThread() != 0 )
+        initialCreate();
+
     if (prio < PRIO_0 || prio > PRIO_2)
     {
         return PRIO_ERROR;
@@ -165,12 +173,8 @@ int cjoin(int tid)
 {
     cjoin_thread *cjt;
 
-    if(checkMainThread() != 0)
-    {
-        if (initialCreate() != 0)
-        {
-            // TODO criar código pra erro de inicialização de fila
-        }
+    if(checkMainThread() != 0 ) {
+        initialCreate();
         // se a thread main não existia, significa que não existia mais nenhuma thread
         // então pode restornar erro de THREAD_NOT_FOUND
         return THREAD_NOT_FOUND;

@@ -26,6 +26,7 @@ int searchThread(PFILA2 queue, int tid){
 	FirstFila2(queue);			
 	pThread = (TCB_t*) GetAtIteratorFila2(queue);
 	while(pThread != NULL){
+    //printf("thread id sendo observado: %d\n", pThread->tid);
 		if(pThread->tid == tid){
 			// found thread and return
 			return 0;
@@ -332,6 +333,7 @@ int initialCreate()
     getcontext(&mainThread->context);
     mainThread->data = NULL;
 
+    AppendFila2(&readyQueuePrio2, mainThread);
     runningThread = mainThread;
 
     /** Inicia o terminate context

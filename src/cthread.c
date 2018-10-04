@@ -85,7 +85,6 @@ int cyield(void)
 
     if (isEmptyQueues())
     {
-      printf("queues vazias\n");
         // Nothing to do, continua o fluxo da thread
         return FUNC_WORKING;
     }
@@ -93,7 +92,6 @@ int cyield(void)
     yieldingThread = runningThread;
 
     moveRunningToReady();
-      printf("queues not vazias\n");
 
     if ( swapcontext(&yieldingThread->context, &schedulerContext) == -1)
     {

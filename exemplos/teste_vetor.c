@@ -1,4 +1,4 @@
-/*
+/* 
  * test_vetor.c: realiza a criação de 10 threads, cada uma delas escreve uma
  * sequencia de 20 letras iguais e passa a vez para outra thread. Repete até
  * preencher um vetor de 250 caracteres.
@@ -30,10 +30,10 @@ void *func(void *arg){
 }
 
 
-int testev(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     int i, pid[MAX_THR];
 
-
+  
     for (i = 0; i < MAX_THR; i++) {
         pid[i] = ccreate(func, (void *)('A'+i), 0);
        if ( pid[i] == -1) {
@@ -42,15 +42,15 @@ int testev(int argc, char *argv[]) {
        }
      }
 
-    for (i = 0; i < MAX_THR; i++)
+    for (i = 0; i < MAX_THR; i++) 
          cjoin(pid[i]);
 
-    for (i = 0; i < MAX_SIZE; i++) {
+    for (i = 0; i < MAX_SIZE; i++) {    
         if ( (i % 20) == 0 )
            printf("\n");
         printf("%c", (char)vetor[i]);
     }
-
+      
     printf("\nConcluido vetor de letras...\n");
     exit(0);
 }
